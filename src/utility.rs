@@ -3,6 +3,7 @@ use termion::raw::RawTerminal;
 use std::io::Stdout;
 use termion::cursor;
 use crate::segment::Segment;
+use crate::line::Line;
 
 pub(crate) fn move_cursor(from: CursorPosition, to: &CursorPosition) -> CursorPosition {
     // Move cursor vertically
@@ -21,4 +22,20 @@ pub(crate) fn move_cursor(from: CursorPosition, to: &CursorPosition) -> CursorPo
 
     // Return the new cursor position
     CursorPosition::init(to.x, to.y)
+}
+
+pub(crate) fn render_line(line: &Line, at: CursorPosition) -> CursorPosition {
+    let mut cursor = at;
+    for segment in line.segments {
+        cursor = render_segment(&segment, cursor);
+    }
+    cursor
+}
+
+pub(crate) fn render_segment(segment: &Segment, at: CursorPosition) -> CursorPosition {
+    // TODO: add color and style
+    print!("{}", segment.text);
+
+    // Return cursor advanced by segment length
+    CursorPosition::init(at.x + segment.text.len(), at.y)
 }
