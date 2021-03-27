@@ -37,5 +37,13 @@ pub(crate) struct DeleteSegmentStep {
 }
 
 impl UpdateStep for DeleteSegmentStep {
-    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
+        if self.line_index > state.lines.len() - 1 {
+            // TODO: throw error, line not added/set
+        }
+
+        if self.segment_index > state.lines[self.line_index].segments.len() - 1 {
+            // TODO: throw error, segment doesn't exist
+        }
+    }
 }
