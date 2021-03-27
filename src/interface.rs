@@ -25,5 +25,11 @@ impl TTYInterface {
         UpdateBatch { steps: Vec::new() }
     }
 
-    pub fn perform_update(&self, batch: UpdateBatch) {}
+    pub fn perform_update(&mut self, batch: UpdateBatch) {
+        let mut update_cursor = self.state.cursor;
+        for step in batch.steps {
+            step.do_update(&mut self.state, &mut update_cursor);
+        }
+        // TODO: return from update_cursor to state.cursor
+    }
 }
