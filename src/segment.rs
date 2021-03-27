@@ -3,7 +3,7 @@ use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
 
 pub struct Segment {
-    text: String,
+    pub text: String,
     // TODO: color
     // TODO: style
 }
