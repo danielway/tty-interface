@@ -32,5 +32,11 @@ pub(crate) struct DeleteLineStep {
 }
 
 impl UpdateStep for DeleteLineStep {
-    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
+        state.lines.remove(self.line_index);
+        for i in self.line_index..state.lines.len() {
+            // TODO: render shifted line
+        }
+        // TODO: clear previous last line
+    }
 }
