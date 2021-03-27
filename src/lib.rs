@@ -4,6 +4,7 @@ pub mod segment;
 pub mod cursor;
 
 mod update;
+mod utility;
 
 #[cfg(test)]
 mod tests {
