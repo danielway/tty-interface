@@ -14,7 +14,7 @@ pub struct TTYInterface<'s> {
     stdout: &'s mut RawTerminal<Stdout>,
 }
 
-impl TTYInterface {
+impl TTYInterface<'_> {
     pub fn new(stdout: &mut RawTerminal<Stdout>) -> TTYInterface {
         TTYInterface {
             state: InterfaceState {
@@ -32,7 +32,7 @@ impl TTYInterface {
     pub fn perform_update(&mut self, batch: UpdateBatch) {
         let mut update_cursor = self.state.cursor;
         for mut step in batch.steps {
-            step.do_update(&mut self.state, &mut update_cursor);
+            step.do_update(self.stdout, &mut self.state, &mut update_cursor);
         }
         // TODO: return from update_cursor to state.cursor
     }
