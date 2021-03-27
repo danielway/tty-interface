@@ -15,3 +15,11 @@ struct SetLineStep {
 impl UpdateStep for SetLineStep {
     fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
 }
+
+struct DeleteLineStep {
+    line_index: usize,
+}
+
+impl UpdateStep for DeleteLineStep {
+    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
+}
