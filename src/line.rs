@@ -33,6 +33,10 @@ pub(crate) struct DeleteLineStep {
 
 impl UpdateStep for DeleteLineStep {
     fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
+        if self.line_index > state.lines.len() - 1 {
+            // TODO: throw error, line doesn't exist
+        }
+
         state.lines.remove(self.line_index);
         for i in self.line_index..state.lines.len() {
             // TODO: render shifted line
