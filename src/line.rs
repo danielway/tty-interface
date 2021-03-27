@@ -14,9 +14,9 @@ pub(crate) struct SetLineStep {
 
 impl UpdateStep for SetLineStep {
     fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
-        if state.lines.len() <= self.line_index + 1 {
+        if self.line_index > state.lines.len() {
             // TODO: throw error, there's a line gap, invalid state
-        } else if state.lines.len() == self.line_index {
+        } else if self.line_index == state.lines.len() {
             state.lines.push(self.line.take().unwrap());
             // TODO: render new line
         } else {
