@@ -19,7 +19,7 @@ impl TTYInterface<'_> {
         TTYInterface {
             state: InterfaceState {
                 lines: Vec::new(),
-                cursor: CursorPosition(0,0)
+                cursor: CursorPosition::init(0, 0)
             },
             stdout
         }

@@ -4,7 +4,16 @@ use termion::raw::RawTerminal;
 use std::io::Stdout;
 
 #[derive(Copy, Clone)]
-pub struct CursorPosition(pub u16, pub u16);
+pub struct CursorPosition {
+    pub x: u16,
+    pub y: u16,
+}
+
+impl CursorPosition {
+    pub(crate) fn init(x: u16, y: u16) -> CursorPosition {
+        CursorPosition { x, y }
+    }
+}
 
 pub(crate) struct UpdateCursorStep {
     pub(crate) new_cursor: CursorPosition,
