@@ -36,7 +36,7 @@ impl TTYInterface<'_> {
 
         // Apply update steps sequentially
         for mut step in batch.steps {
-            step.do_update(self.stdout, &mut self.state, &mut update_cursor);
+            step.do_update(&mut self.state, &mut update_cursor);
         }
 
         // Return cursor from working position to state-specified position

@@ -2,8 +2,6 @@ use crate::segment::Segment;
 use crate::cursor::CursorPosition;
 use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
-use termion::raw::RawTerminal;
-use std::io::Stdout;
 
 pub struct Line {
     pub segments: Vec<Segment>,
@@ -15,8 +13,7 @@ pub(crate) struct SetLineStep {
 }
 
 impl UpdateStep for SetLineStep {
-    fn do_update(&mut self, stdout: &mut RawTerminal<Stdout>, state: &mut InterfaceState,
-                 update_cursor: &mut CursorPosition) {
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
         if self.line_index > state.lines.len() {
             // TODO: throw error, there's a line gap, invalid state
         } else if self.line_index == state.lines.len() {
@@ -35,8 +32,7 @@ pub(crate) struct DeleteLineStep {
 }
 
 impl UpdateStep for DeleteLineStep {
-    fn do_update(&mut self, stdout: &mut RawTerminal<Stdout>, state: &mut InterfaceState,
-                 update_cursor: &mut CursorPosition) {
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
         if self.line_index > state.lines.len() - 1 {
             // TODO: throw error, line doesn't exist
         }
