@@ -3,6 +3,7 @@ use crate::line::Line;
 use crate::update::UpdateBatch;
 use termion::raw::RawTerminal;
 use std::io::Stdout;
+use crate::utility::move_cursor;
 
 pub(crate) struct InterfaceState {
     pub(crate) cursor: CursorPosition,
@@ -30,10 +31,15 @@ impl TTYInterface<'_> {
     }
 
     pub fn perform_update(&mut self, batch: UpdateBatch) {
+        // Tracks cursor throughout update steps
         let mut update_cursor = self.state.cursor;
+
+        // Apply update steps sequentially
         for mut step in batch.steps {
             step.do_update(self.stdout, &mut self.state, &mut update_cursor);
         }
-        // TODO: return from update_cursor to state.cursor
+
+        // Return cursor from working position to state-specified position
+        move_cursor(self.stdout, &update_cursor, &self.state.cursor);
     }
 }
