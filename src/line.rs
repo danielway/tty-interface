@@ -7,11 +7,11 @@ pub struct Line {
     segments: Option<Vec<Segment>>,
 }
 
-struct LineUpdate {
+struct SetLineStep {
     line_index: usize,
     line: Option<Line>,
 }
 
-impl UpdateStep for LineUpdate {
+impl UpdateStep for SetLineStep {
     fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
 }
