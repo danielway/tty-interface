@@ -4,8 +4,8 @@ use crate::interface::InterfaceState;
 #[derive(Copy, Clone)]
 pub struct CursorPosition(pub u16, pub u16);
 
-struct CursorUpdate {
-    new_cursor: CursorPosition,
+pub(crate) struct CursorUpdate {
+    pub(crate) new_cursor: CursorPosition,
 }
 
 impl UpdateStep for CursorUpdate {
