@@ -1,23 +1,27 @@
 use crate::cursor::CursorPosition;
 use crate::line::Line;
 use crate::update::UpdateBatch;
+use termion::raw::RawTerminal;
+use std::io::Stdout;
 
 pub(crate) struct InterfaceState {
     pub(crate) cursor: CursorPosition,
     pub(crate) lines: Vec<Line>,
 }
 
-pub struct TTYInterface {
+pub struct TTYInterface<'s> {
     state: InterfaceState,
+    stdout: &'s mut RawTerminal<Stdout>,
 }
 
 impl TTYInterface {
-    pub fn new() -> TTYInterface {
+    pub fn new(stdout: &mut RawTerminal<Stdout>) -> TTYInterface {
         TTYInterface {
             state: InterfaceState {
                 lines: Vec::new(),
                 cursor: CursorPosition(0,0)
-            }
+            },
+            stdout
         }
     }
 
