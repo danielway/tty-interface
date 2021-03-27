@@ -1,7 +1,7 @@
 use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub struct CursorPosition {
     pub x: u16,
     pub y: u16,
