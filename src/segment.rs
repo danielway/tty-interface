@@ -8,13 +8,13 @@ pub struct Segment {
     // TODO: style
 }
 
-pub(crate) struct SegmentUpdate {
+pub(crate) struct SetSegmentStep {
     pub(crate) line_index: usize,
     pub(crate) segment_index: usize,
     pub(crate) segment: Option<Segment>,
 }
 
-impl UpdateStep for SegmentUpdate {
+impl UpdateStep for SetSegmentStep {
     fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
 }
 
