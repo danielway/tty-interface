@@ -9,5 +9,7 @@ struct CursorUpdate {
 }
 
 impl UpdateStep for CursorUpdate {
-    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
+    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
+        state.cursor = self.new_cursor;
+    }
 }
