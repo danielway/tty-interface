@@ -40,6 +40,6 @@ impl TTYInterface<'_> {
         }
 
         // Return cursor from working position to state-specified position
-        move_cursor(&update_cursor, &self.state.cursor);
+        move_cursor(update_cursor, &self.state.cursor);
     }
 }
