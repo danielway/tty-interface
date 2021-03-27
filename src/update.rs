@@ -1,5 +1,5 @@
 use crate::cursor::{CursorPosition, UpdateCursorStep};
-use crate::line::Line;
+use crate::line::{Line, DeleteLineStep, SetLineStep};
 use crate::segment::Segment;
 use crate::interface::InterfaceState;
 
@@ -13,12 +13,22 @@ pub struct UpdateBatch {
 
 impl UpdateBatch {
     fn set_cursor(&mut self, new_cursor: CursorPosition) {
-        self.steps.push(Box::new(UpdateCursorStep { new_cursor }));
+        self.steps.push(
+            Box::new(UpdateCursorStep { new_cursor })
+        );
     }
 
-    fn set_line(&self, line_index: usize, line: Line) {}
+    fn set_line(&mut self, line_index: usize, line: Line) {
+        self.steps.push(
+            Box::new(SetLineStep { line_index, line: Some(line) })
+        );
+    }
 
-    fn delete_line(&self, line_index: usize) {}
+    fn delete_line(&mut self, line_index: usize) {
+        self.steps.push(
+            Box::new(DeleteLineStep { line_index })
+        );
+    }
 
     fn set_segment(&self, line_index: usize, segment_index: usize, segment: Segment) {}
 

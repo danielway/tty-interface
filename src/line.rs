@@ -7,17 +7,17 @@ pub struct Line {
     segments: Option<Vec<Segment>>,
 }
 
-struct SetLineStep {
-    line_index: usize,
-    line: Option<Line>,
+pub(crate) struct SetLineStep {
+    pub(crate) line_index: usize,
+    pub(crate) line: Option<Line>,
 }
 
 impl UpdateStep for SetLineStep {
     fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
 }
 
-struct DeleteLineStep {
-    line_index: usize,
+pub(crate) struct DeleteLineStep {
+    pub(crate) line_index: usize,
 }
 
 impl UpdateStep for DeleteLineStep {
