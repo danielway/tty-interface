@@ -8,7 +8,7 @@ pub struct Line {
 }
 
 struct LineUpdate {
-    line_index: u16,
+    line_index: usize,
     line: Option<Line>,
 }
 

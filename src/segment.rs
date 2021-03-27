@@ -9,8 +9,8 @@ pub struct Segment {
 }
 
 struct SegmentUpdate {
-    line_index: u16,
-    segment_index: u16,
+    line_index: usize,
+    segment_index: usize,
     segment: Option<Segment>,
 }
 

@@ -13,8 +13,8 @@ pub struct UpdateBatch {
 
 impl UpdateBatch {
     fn set_cursor(&self, new_cursor: CursorPosition) {}
-    fn set_line(&self, line_index: u16, line: Line) {}
-    fn delete_line(&self, line_index: u16) {}
-    fn set_segment(&self, line_index: u16, segment_index: u16, segment: Segment) {}
-    fn delete_segment(&self, line_index: u16, segment_index: u16) {}
+    fn set_line(&self, line_index: usize, line: Line) {}
+    fn delete_line(&self, line_index: usize) {}
+    fn set_segment(&self, line_index: usize, segment_index: usize, segment: Segment) {}
+    fn delete_segment(&self, line_index: usize, segment_index: usize) {}
 }
