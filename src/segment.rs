@@ -11,7 +11,7 @@ pub struct Segment {
 struct SegmentUpdate {
     line_index: u16,
     segment_index: u16,
-    segment: Segment,
+    segment: Option<Segment>,
 }
 
 impl UpdateStep for SegmentUpdate {

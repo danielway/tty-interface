@@ -4,12 +4,12 @@ use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
 
 pub struct Line {
-    segments: Vec<Segment>,
+    segments: Option<Vec<Segment>>,
 }
 
 struct LineUpdate {
     line_index: u16,
-    line: Line,
+    line: Option<Line>,
 }
 
 impl UpdateStep for LineUpdate {
