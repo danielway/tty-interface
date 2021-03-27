@@ -4,7 +4,7 @@ use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
 
 pub struct Line {
-    pub segments: Option<Vec<Segment>>,
+    pub segments: Vec<Segment>,
 }
 
 pub(crate) struct SetLineStep {
