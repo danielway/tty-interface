@@ -1,6 +1,6 @@
 use crate::cursor::{CursorPosition, UpdateCursorStep};
 use crate::line::{Line, DeleteLineStep, SetLineStep};
-use crate::segment::Segment;
+use crate::segment::{Segment, SetSegmentStep, DeleteSegmentStep};
 use crate::interface::InterfaceState;
 
 pub(crate) trait UpdateStep {
@@ -30,7 +30,15 @@ impl UpdateBatch {
         );
     }
 
-    fn set_segment(&self, line_index: usize, segment_index: usize, segment: Segment) {}
+    fn set_segment(&mut self, line_index: usize, segment_index: usize, segment: Segment) {
+        self.steps.push(
+            Box::new(SetSegmentStep { line_index, segment_index, segment: Some(segment) })
+        );
+    }
 
-    fn delete_segment(&self, line_index: usize, segment_index: usize) {}
+    fn delete_segment(&mut self, line_index: usize, segment_index: usize) {
+        self.steps.push(
+            Box::new(DeleteSegmentStep { line_index, segment_index })
+        );
+    }
 }
