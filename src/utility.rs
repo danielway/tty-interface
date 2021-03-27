@@ -24,6 +24,10 @@ pub(crate) fn move_cursor(from: CursorPosition, to: &CursorPosition) -> CursorPo
     CursorPosition::init(to.x, to.y)
 }
 
+pub(crate) fn clear_line() {
+    print!("{}", termion::clear::CurrentLine);
+}
+
 pub(crate) fn render_line(line: &Line, at: CursorPosition) -> CursorPosition {
     let mut cursor = at;
     for segment in line.segments {
