@@ -3,8 +3,8 @@ use crate::line::Line;
 use crate::update::UpdateBatch;
 
 pub(crate) struct InterfaceState {
-    cursor: CursorPosition,
-    lines: Vec<Line>,
+    pub(crate) cursor: CursorPosition,
+    pub(crate) lines: Vec<Line>,
 }
 
 pub struct TTYInterface {
