@@ -1,3 +1,10 @@
+pub mod interface;
+pub mod line;
+pub mod segment;
+pub mod cursor;
+
+mod update;
+
 #[cfg(test)]
 mod tests {
     #[test]
