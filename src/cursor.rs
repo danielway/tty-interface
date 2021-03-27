@@ -9,7 +9,7 @@ pub(crate) struct UpdateCursorStep {
 }
 
 impl UpdateStep for UpdateCursorStep {
-    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
         state.cursor = self.new_cursor;
     }
 }

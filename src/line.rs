@@ -13,7 +13,7 @@ pub(crate) struct SetLineStep {
 }
 
 impl UpdateStep for SetLineStep {
-    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
 }
 
 pub(crate) struct DeleteLineStep {
@@ -21,5 +21,5 @@ pub(crate) struct DeleteLineStep {
 }
 
 impl UpdateStep for DeleteLineStep {
-    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
 }

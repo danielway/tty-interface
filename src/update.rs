@@ -4,7 +4,7 @@ use crate::segment::{Segment, SetSegmentStep, DeleteSegmentStep};
 use crate::interface::InterfaceState;
 
 pub(crate) trait UpdateStep {
-    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition);
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition);
 }
 
 pub struct UpdateBatch {

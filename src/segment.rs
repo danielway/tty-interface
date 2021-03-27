@@ -15,7 +15,7 @@ pub(crate) struct SetSegmentStep {
 }
 
 impl UpdateStep for SetSegmentStep {
-    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
 }
 
 pub(crate) struct DeleteSegmentStep {
@@ -24,5 +24,5 @@ pub(crate) struct DeleteSegmentStep {
 }
 
 impl UpdateStep for DeleteSegmentStep {
-    fn do_update(&self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
+    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {}
 }
