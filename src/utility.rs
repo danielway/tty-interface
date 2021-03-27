@@ -1,11 +1,11 @@
 use crate::cursor::CursorPosition;
 use termion::raw::RawTerminal;
-use std::io::Stdout;
+use std::io::{Stdout, Cursor};
 use termion::cursor;
 use crate::segment::Segment;
 use crate::line::Line;
 
-pub(crate) fn move_cursor(from: CursorPosition, to: &CursorPosition) -> CursorPosition {
+pub(crate) fn move_cursor(cursor: &mut CursorPosition, to: &CursorPosition) {
     // Move cursor vertically
     if from.y < to.y {
         print!("{}", cursor::Down(to.y - from.y));
@@ -20,26 +20,22 @@ pub(crate) fn move_cursor(from: CursorPosition, to: &CursorPosition) -> CursorPo
         print!("{}", cursor::Left(from.x - to.x));
     }
 
-    // Return the new cursor position
-    CursorPosition::init(to.x, to.y)
+    cursor.y = to.y;
+    cursor.x = to.x;
 }
 
 pub(crate) fn clear_line() {
     print!("{}", termion::clear::CurrentLine);
 }
 
-pub(crate) fn render_line(line: &Line, at: CursorPosition) -> CursorPosition {
-    let mut cursor = at;
+pub(crate) fn render_line(cursor: &mut CursorPosition, line: &Line) {
     for segment in line.segments {
-        cursor = render_segment(&segment, cursor);
+        render_segment(cursor, &segment);
     }
-    cursor
 }
 
-pub(crate) fn render_segment(segment: &Segment, at: CursorPosition) -> CursorPosition {
+pub(crate) fn render_segment(cursor: &mut CursorPosition, segment: &Segment) {
     // TODO: add color and style
     print!("{}", segment.text);
-
-    // Return cursor advanced by segment length
-    CursorPosition::init(at.x + segment.text.len(), at.y)
+    cursor.x += segment.text.len();
 }
