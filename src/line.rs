@@ -35,8 +35,8 @@ impl UpdateStep for SetLineStep {
         }
 
         // Render appended/updated line
-        move_cursor_exact(cursor, 0, self.line_index as u16);
-        render_line(cursor, &state.lines[self.line_index]);
+        move_cursor_exact(update_cursor, 0, self.line_index as u16);
+        render_line(update_cursor, &state.lines[self.line_index]);
     }
 }
 
@@ -59,8 +59,8 @@ impl UpdateStep for DeleteLineStep {
         // Shift lines >line_index down and render them; clear last (now shifted up) line
         state.lines.remove(self.line_index);
         for i in self.line_index..state.lines.len() {
-            render_line(cursor, &state.lines[i]);
-            move_cursor_by(cursor, 0, 1);
+            render_line(update_cursor, &state.lines[i]);
+            move_cursor_by(update_cursor, 0, 1);
         }
         clear_line();
     }
