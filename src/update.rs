@@ -12,31 +12,31 @@ pub struct UpdateBatch {
 }
 
 impl UpdateBatch {
-    fn set_cursor(&mut self, new_cursor: CursorPosition) {
+    pub fn set_cursor(&mut self, new_cursor: CursorPosition) {
         self.steps.push(
             Box::new(UpdateCursorStep { new_cursor })
         );
     }
 
-    fn set_line(&mut self, line_index: usize, line: Line) {
+    pub fn set_line(&mut self, line_index: usize, line: Line) {
         self.steps.push(
             Box::new(SetLineStep { line_index, line: Some(line) })
         );
     }
 
-    fn delete_line(&mut self, line_index: usize) {
+    pub fn delete_line(&mut self, line_index: usize) {
         self.steps.push(
             Box::new(DeleteLineStep { line_index })
         );
     }
 
-    fn set_segment(&mut self, line_index: usize, segment_index: usize, segment: Segment) {
+    pub fn set_segment(&mut self, line_index: usize, segment_index: usize, segment: Segment) {
         self.steps.push(
             Box::new(SetSegmentStep { line_index, segment_index, segment: Some(segment) })
         );
     }
 
-    fn delete_segment(&mut self, line_index: usize, segment_index: usize) {
+    pub fn delete_segment(&mut self, line_index: usize, segment_index: usize) {
         self.steps.push(
             Box::new(DeleteSegmentStep { line_index, segment_index })
         );
