@@ -26,9 +26,21 @@ impl UpdateStep for SetSegmentStep {
             // TODO: throw error, leaves gap in segments
         }
 
+        let diff_length = state.lines[self.line_index].segments[self.segment_index].text.len()
+            != self.segment.as_ref().unwrap().text.len();
+
         state.lines[self.line_index].segments[self.segment_index] = self.segment.take().unwrap();
-        // TODO: rerender this segment
-        // TODO: if segment length differed, rerender segments after
+
+        let segment_start = state.lines[self.line_index].get_segment_start(self.segment_index);
+        move_cursor_exact(update_cursor, segment_start, self.line_index as u16);
+        render_segment(update_cursor, &state.lines[self.line_index].segments[self.segment_index]);
+
+        if diff_length {
+            clear_rest_of_line();
+            for segment in &state.lines[self.line_index].segments[self.segment_index+1..] {
+                render_segment(update_cursor, segment);
+            }
+        }
     }
 }
 
@@ -53,7 +65,7 @@ impl UpdateStep for DeleteSegmentStep {
 
         state.lines[self.line_index].segments.remove(self.segment_index);
 
-        for segment in &state.lines[self.line_index].segments {
+        for segment in &state.lines[self.line_index].segments[self.segment_index..] {
             render_segment(update_cursor, segment);
         }
     }
