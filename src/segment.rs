@@ -2,6 +2,7 @@ use crate::cursor::CursorPosition;
 use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
 use crate::line::Line;
+use crate::utility::{clear_rest_of_line, move_cursor_exact, render_segment};
 
 pub struct Segment {
     pub text: String,
@@ -44,6 +45,16 @@ impl UpdateStep for DeleteSegmentStep {
 
         if self.segment_index > state.lines[self.line_index].segments.len() - 1 {
             // TODO: throw error, segment doesn't exist
+        }
+
+        let segment_start = state.lines[self.line_index].get_segment_start(self.segment_index);
+        move_cursor_exact(update_cursor, segment_start, self.line_index as u16);
+        clear_rest_of_line();
+
+        state.lines[self.line_index].segments.remove(self.segment_index);
+
+        for segment in &state.lines[self.line_index].segments {
+            render_segment(update_cursor, segment);
         }
     }
 }
