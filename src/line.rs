@@ -8,6 +8,17 @@ pub struct Line {
     pub segments: Vec<Segment>,
 }
 
+impl Line {
+    /// Returns the character position for the specified segment within the line.
+    pub(crate) fn get_segment_start(&self, segment_index: usize) -> u16 {
+        let mut segment_start = 0;
+        for i in 0..segment_index {
+            segment_start += self.segments[i].text.len();
+        }
+        segment_start as u16
+    }
+}
+
 pub(crate) struct SetLineStep {
     pub(crate) line_index: usize,
     pub(crate) line: Option<Line>,
