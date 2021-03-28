@@ -12,7 +12,7 @@ pub(crate) fn move_cursor_to(cursor: &mut CursorPosition, to: &CursorPosition) {
 
 /// Moves the cursor to the specified coordinates and updates `cursor` accordingly.
 pub(crate) fn move_cursor_exact(cursor: &mut CursorPosition, x: u16, y: u16) {
-    move_cursor_by(cursor, (cursor.x - x) as i16, (cursor.y - y) as i16);
+    move_cursor_by(cursor, x as i16 - cursor.x as i16,  y as i16- cursor.y as i16);
 }
 
 /// Moves the cursor by a specified diff and updates `cursor`.
