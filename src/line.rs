@@ -19,13 +19,13 @@ impl UpdateStep for SetLineStep {
             // TODO: throw error, there's a line gap, invalid state
         } else if self.line_index == state.lines.len() {
             state.lines.push(self.line.take().unwrap());
-            move_cursor_exact(cursor, 0, self.line_index as u16);
-            render_line(cursor, &state.lines.last().unwrap());
         } else {
             state.lines[self.line_index] = self.line.take().unwrap();
-            // TODO: clear updated line
-            // TODO: render updated line
         }
+
+        // Render appended/updated line
+        move_cursor_exact(cursor, 0, self.line_index as u16);
+        render_line(cursor, &state.lines[self.line_index]);
     }
 }
 
