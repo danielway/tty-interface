@@ -46,6 +46,11 @@ pub(crate) fn clear_line() {
     print!("{}", termion::clear::CurrentLine);
 }
 
+/// Clears from the current cursor position to the end of the line.
+pub(crate) fn clear_rest_of_line() {
+    print!("{}", termion::clear::UntilNewline)
+}
+
 /// Clears the terminal line, renders the `line`, and updates the `cursor` position according to the
 /// `line`'s total length. Will move the `cursor` to `x=0` if `>0`.
 pub(crate) fn render_line(cursor: &mut CursorPosition, line: &Line) {
