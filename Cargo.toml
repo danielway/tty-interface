@@ -1,9 +1,11 @@
 [package]
 name = "tty-interface"
-version = "0.1.0"
+description = "Provides simple TTY-based interface capabilities including partial re-renders of multi-line displays."
+version = "1.0.0"
 authors = ["Daniel Way <contact@danieldway.com>"]
 edition = "2018"
 license-file = "LICENSE"
+repository = "https://github.com/danielway/tty-interface"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
