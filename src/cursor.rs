@@ -1,5 +1,8 @@
 use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
+use termion::raw::RawTerminal;
+use std::io::StdoutLock;
+use crate::result::Result;
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct CursorPosition {
@@ -18,7 +21,10 @@ pub(crate) struct UpdateCursorStep {
 }
 
 impl UpdateStep for UpdateCursorStep {
-    fn do_update(&mut self, state: &mut InterfaceState, update_cursor: &mut CursorPosition) {
+    fn do_update(&mut self, _stdout: &mut RawTerminal<StdoutLock>, state: &mut InterfaceState,
+                 _update_cursor: &mut CursorPosition) -> Result<()> {
         state.cursor = self.new_cursor;
+
+        Ok(())
     }
 }
