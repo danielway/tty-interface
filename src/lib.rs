@@ -3,8 +3,8 @@ pub mod line;
 pub mod segment;
 pub mod cursor;
 pub mod result;
+pub mod update;
 
-mod update;
 mod utility;
 
 #[cfg(test)]
