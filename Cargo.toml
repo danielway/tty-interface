@@ -4,7 +4,7 @@ description = "Provides simple TTY-based interface capabilities including partia
 version = "1.0.0"
 authors = ["Daniel Way <contact@danieldway.com>"]
 edition = "2018"
-license-file = "LICENSE"
+license = "MIT"
 repository = "https://github.com/danielway/tty-interface"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
