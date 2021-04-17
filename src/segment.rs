@@ -1,9 +1,10 @@
+use termion::raw::RawTerminal;
+use std::io::StdoutLock;
+
 use crate::cursor::CursorPosition;
 use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
 use crate::utility::{clear_rest_of_line, move_cursor_exact, render_segment};
-use termion::raw::RawTerminal;
-use std::io::StdoutLock;
 use crate::result::{Result, TTYError};
 
 pub struct Segment {

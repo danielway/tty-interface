@@ -1,10 +1,11 @@
+use termion::raw::RawTerminal;
+use std::io::StdoutLock;
+
 use crate::segment::Segment;
 use crate::cursor::CursorPosition;
 use crate::update::UpdateStep;
 use crate::interface::InterfaceState;
 use crate::utility::{move_cursor_exact, render_line, move_cursor_by, clear_line};
-use termion::raw::RawTerminal;
-use std::io::StdoutLock;
 use crate::result::{Result, TTYError};
 
 pub struct Line {

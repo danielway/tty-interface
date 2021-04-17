@@ -1,7 +1,8 @@
-use crate::update::UpdateStep;
-use crate::interface::InterfaceState;
 use termion::raw::RawTerminal;
 use std::io::StdoutLock;
+
+use crate::update::UpdateStep;
+use crate::interface::InterfaceState;
 use crate::result::Result;
 
 #[derive(Copy, Clone, Eq, PartialEq)]

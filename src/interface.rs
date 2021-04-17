@@ -1,8 +1,9 @@
+use termion::raw::RawTerminal;
+use std::io::{Write, StdoutLock};
+
 use crate::cursor::CursorPosition;
 use crate::line::Line;
 use crate::update::UpdateBatch;
-use termion::raw::RawTerminal;
-use std::io::{Write, StdoutLock};
 use crate::utility::move_cursor_to;
 use crate::result::Result;
 

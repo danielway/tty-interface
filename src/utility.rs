@@ -1,7 +1,8 @@
-use crate::cursor::CursorPosition;
 use termion::raw::RawTerminal;
 use std::io::{StdoutLock, Write};
 use termion::cursor;
+
+use crate::cursor::CursorPosition;
 use crate::segment::Segment;
 use crate::line::Line;
 use crate::result::{Result, TTYError};
