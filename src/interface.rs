@@ -1,4 +1,5 @@
 use termion::raw::RawTerminal;
+use std::io;
 use std::io::{Write, StdoutLock};
 
 use crate::cursor::CursorPosition;
@@ -12,13 +13,15 @@ pub(crate) struct InterfaceState {
     pub(crate) lines: Vec<Line>,
 }
 
-pub struct TTYInterface {
+pub struct TTYInterface<'a> {
+    pub(crate) writer: &'a mut dyn io::Write,
     state: InterfaceState,
 }
 
-impl TTYInterface {
-    pub fn new() -> TTYInterface {
+impl TTYInterface<'_> {
+    pub fn new(writer: &mut dyn io::Write) -> TTYInterface {
         TTYInterface {
+            writer,
             state: InterfaceState {
                 lines: Vec::new(),
                 cursor: CursorPosition::init(0, 0)
