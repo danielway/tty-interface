@@ -1,5 +1,7 @@
 # TTY Interface
 
+[![Crate](https://img.shields.io/crates/v/tty-interface.svg)](https://crates.io/crates/tty-interface)
+
 Provides simple TTY-based user interface capabilities including partial re-renders of multi-line displays. Uses 
 [Termion](https://crates.io/crates/termion) for basic TTY terminal interactions, though consumers of TTY Interface 
 need not depend on Termion directly themselves; TTY Interface will accept and output to any `Write` writer.
