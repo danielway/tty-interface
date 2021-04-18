@@ -15,7 +15,7 @@ pub(crate) struct InterfaceState {
 
 pub struct TTYInterface<'a> {
     pub(crate) writer: &'a mut dyn io::Write,
-    state: InterfaceState,
+    pub(crate) state: InterfaceState,
 }
 
 impl TTYInterface<'_> {
@@ -39,7 +39,7 @@ impl TTYInterface<'_> {
 
         // Apply update steps sequentially
         for mut step in batch.steps {
-            step.do_update(stdout, &mut self.state, &mut update_cursor)?;
+            step.do_update(self, &mut update_cursor)?;
         }
 
         // Return cursor from working position to state-specified position

@@ -1,15 +1,11 @@
-use termion::raw::RawTerminal;
-use std::io::StdoutLock;
-
 use crate::cursor::{CursorPosition, UpdateCursorStep};
 use crate::line::{Line, DeleteLineStep, SetLineStep};
 use crate::segment::{Segment, SetSegmentStep, DeleteSegmentStep};
-use crate::interface::InterfaceState;
+use crate::interface::TTYInterface;
 use crate::result::Result;
 
 pub(crate) trait UpdateStep {
-    fn do_update(&mut self, stdout: &mut RawTerminal<StdoutLock>, state: &mut InterfaceState,
-                 update_cursor: &mut CursorPosition) -> Result<()>;
+    fn do_update(&mut self, interface: &mut TTYInterface, update_cursor: &mut CursorPosition) -> Result<()>;
 }
 
 pub struct UpdateBatch {

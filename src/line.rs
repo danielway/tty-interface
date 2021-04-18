@@ -1,10 +1,7 @@
-use termion::raw::RawTerminal;
-use std::io::StdoutLock;
-
 use crate::segment::Segment;
 use crate::cursor::CursorPosition;
 use crate::update::UpdateStep;
-use crate::interface::InterfaceState;
+use crate::interface::TTYInterface;
 use crate::utility::{move_cursor_exact, render_line, move_cursor_by, clear_line};
 use crate::result::{Result, TTYError};
 
@@ -29,22 +26,21 @@ pub(crate) struct SetLineStep {
 }
 
 impl UpdateStep for SetLineStep {
-    fn do_update(&mut self, stdout: &mut RawTerminal<StdoutLock>, state: &mut InterfaceState,
-                 update_cursor: &mut CursorPosition) -> Result<()> {
-        if self.line_index > state.lines.len() {
+    fn do_update(&mut self, interface: &mut TTYInterface, update_cursor: &mut CursorPosition) -> Result<()> {
+        if self.line_index > interface.state.lines.len() {
             return Err(TTYError::LineOutOfBounds);
         }
 
         let line = self.line.take().expect("SetLineStep is missing a Line");
-        if self.line_index == state.lines.len() {
-            state.lines.push(line);
+        if self.line_index == interface.state.lines.len() {
+            interface.state.lines.push(line);
         } else {
-            state.lines[self.line_index] = line;
+            interface.state.lines[self.line_index] = line;
         }
 
         // Render appended/updated line
-        move_cursor_exact(stdout, update_cursor, 0, self.line_index as u16)?;
-        render_line(stdout, update_cursor, &state.lines[self.line_index])?;
+        move_cursor_exact(interface.writer, update_cursor, 0, self.line_index as u16)?;
+        render_line(interface.writer, update_cursor, &interface.state.lines[self.line_index])?;
 
         Ok(())
     }
@@ -55,25 +51,24 @@ pub(crate) struct DeleteLineStep {
 }
 
 impl UpdateStep for DeleteLineStep {
-    fn do_update(&mut self, stdout: &mut RawTerminal<StdoutLock>, state: &mut InterfaceState,
-                 update_cursor: &mut CursorPosition) -> Result<()> {
-        if self.line_index > state.lines.len() - 1 {
+    fn do_update(&mut self, interface: &mut TTYInterface, update_cursor: &mut CursorPosition) -> Result<()> {
+        if self.line_index > interface.state.lines.len() - 1 {
             return Err(TTYError::LineOutOfBounds);
         }
 
         // If the cursor isn't on this line, move it here
         let line_y: u16 = self.line_index as u16;
         if update_cursor.y != line_y {
-            move_cursor_exact(stdout, update_cursor, 0, line_y)?;
+            move_cursor_exact(interface.writer, update_cursor, 0, line_y)?;
         }
 
         // Shift lines >line_index down and render them; clear last (now shifted up) line
-        state.lines.remove(self.line_index);
-        for i in self.line_index..state.lines.len() {
-            render_line(stdout, update_cursor, &state.lines[i])?;
-            move_cursor_by(stdout, update_cursor, 0, 1)?;
+        interface.state.lines.remove(self.line_index);
+        for i in self.line_index..interface.state.lines.len() {
+            render_line(interface.writer, update_cursor, &interface.state.lines[i])?;
+            move_cursor_by(interface.writer, update_cursor, 0, 1)?;
         }
-        clear_line(stdout)?;
+        clear_line(interface.writer)?;
 
         Ok(())
     }

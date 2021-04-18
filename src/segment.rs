@@ -1,9 +1,6 @@
-use termion::raw::RawTerminal;
-use std::io::StdoutLock;
-
 use crate::cursor::CursorPosition;
 use crate::update::UpdateStep;
-use crate::interface::InterfaceState;
+use crate::interface::TTYInterface;
 use crate::utility::{clear_rest_of_line, move_cursor_exact, render_segment};
 use crate::result::{Result, TTYError};
 
@@ -20,29 +17,28 @@ pub(crate) struct SetSegmentStep {
 }
 
 impl UpdateStep for SetSegmentStep {
-    fn do_update(&mut self, stdout: &mut RawTerminal<StdoutLock>, state: &mut InterfaceState,
-                 update_cursor: &mut CursorPosition) -> Result<()> {
-        if self.line_index > state.lines.len() - 1 {
+    fn do_update(&mut self, interface: &mut TTYInterface, update_cursor: &mut CursorPosition) -> Result<()> {
+        if self.line_index > interface.state.lines.len() - 1 {
             return Err(TTYError::LineOutOfBounds);
         }
 
-        if self.segment_index > state.lines[self.line_index].segments.len() {
+        if self.segment_index > interface.state.lines[self.line_index].segments.len() {
             return Err(TTYError::SegmentOutOfBounds);
         }
 
-        let diff_length = state.lines[self.line_index].segments[self.segment_index].text.len()
+        let diff_length = interface.state.lines[self.line_index].segments[self.segment_index].text.len()
             != self.segment.as_ref().unwrap().text.len();
 
-        state.lines[self.line_index].segments[self.segment_index] = self.segment.take().unwrap();
+        interface.state.lines[self.line_index].segments[self.segment_index] = self.segment.take().unwrap();
 
-        let segment_start = state.lines[self.line_index].get_segment_start(self.segment_index);
-        move_cursor_exact(stdout, update_cursor, segment_start, self.line_index as u16)?;
-        render_segment(stdout, update_cursor, &state.lines[self.line_index].segments[self.segment_index])?;
+        let segment_start = interface.state.lines[self.line_index].get_segment_start(self.segment_index);
+        move_cursor_exact(interface.writer, update_cursor, segment_start, self.line_index as u16)?;
+        render_segment(interface.writer, update_cursor, &interface.state.lines[self.line_index].segments[self.segment_index])?;
 
         if diff_length {
-            clear_rest_of_line(stdout)?;
-            for segment in &state.lines[self.line_index].segments[self.segment_index+1..] {
-                render_segment(stdout, update_cursor, segment)?;
+            clear_rest_of_line(interface.writer)?;
+            for segment in &interface.state.lines[self.line_index].segments[self.segment_index+1..] {
+                render_segment(interface.writer, update_cursor, segment)?;
             }
         }
 
@@ -56,24 +52,23 @@ pub(crate) struct DeleteSegmentStep {
 }
 
 impl UpdateStep for DeleteSegmentStep {
-    fn do_update(&mut self, stdout: &mut RawTerminal<StdoutLock>, state: &mut InterfaceState,
-                 update_cursor: &mut CursorPosition) -> Result<()> {
-        if self.line_index > state.lines.len() - 1 {
+    fn do_update(&mut self, interface: &mut TTYInterface, update_cursor: &mut CursorPosition) -> Result<()> {
+        if self.line_index > interface.state.lines.len() - 1 {
             return Err(TTYError::LineOutOfBounds);
         }
 
-        if self.segment_index > state.lines[self.line_index].segments.len() - 1 {
+        if self.segment_index > interface.state.lines[self.line_index].segments.len() - 1 {
             return Err(TTYError::SegmentOutOfBounds);
         }
 
-        let segment_start = state.lines[self.line_index].get_segment_start(self.segment_index);
-        move_cursor_exact(stdout, update_cursor, segment_start, self.line_index as u16)?;
-        clear_rest_of_line(stdout)?;
+        let segment_start = interface.state.lines[self.line_index].get_segment_start(self.segment_index);
+        move_cursor_exact(interface.writer, update_cursor, segment_start, self.line_index as u16)?;
+        clear_rest_of_line(interface.writer)?;
 
-        state.lines[self.line_index].segments.remove(self.segment_index);
+        interface.state.lines[self.line_index].segments.remove(self.segment_index);
 
-        for segment in &state.lines[self.line_index].segments[self.segment_index..] {
-            render_segment(stdout, update_cursor, segment)?;
+        for segment in &interface.state.lines[self.line_index].segments[self.segment_index..] {
+            render_segment(interface.writer, update_cursor, segment)?;
         }
 
         Ok(())
