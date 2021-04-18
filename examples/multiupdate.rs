@@ -1,10 +1,12 @@
 extern crate tty_interface;
 
-use tty_interface::interface::TTYInterface;
+use termion::{color, style};
 use termion::raw::IntoRawMode;
 use std::io::stdout;
+
+use tty_interface::interface::TTYInterface;
 use tty_interface::line::Line;
-use tty_interface::segment::Segment;
+use tty_interface::segment::{Segment, SegmentFormatting};
 
 fn main() -> tty_interface::result::Result<()> {
     let stdout = stdout();
@@ -18,7 +20,7 @@ fn main() -> tty_interface::result::Result<()> {
         for j in 0..i {
             batch.set_line(j, Line {
                 segments: vec![
-                    Segment { text: format!("Line {}", i - j) }
+                    Segment::new(format!("Line {}", i - j))
                 ]
             });
         }
@@ -28,12 +30,25 @@ fn main() -> tty_interface::result::Result<()> {
         std::thread::sleep(std::time::Duration::from_millis(500));
     }
 
+    let bold_red = SegmentFormatting::new(
+        format!("{}{}", color::Fg(color::Red), style::Bold),
+        format!("{}{}", color::Fg(color::Reset), style::NoBold)
+    );
+
+    let italic_blue = SegmentFormatting::new(
+        format!("{}{}", color::Fg(color::Blue), style::Italic),
+        format!("{}{}", color::Fg(color::Reset), style::NoItalic)
+    );
+
     for i in 0..10 {
         let mut batch = tty.start_update();
 
         batch.set_line(i, Line {
             segments: vec![
-                Segment { text: format!("Line {}", i + 1) }
+                Segment::new_formatted(
+                    format!("Line {}", i + 1),
+                    if i % 2 == 0 { bold_red.clone() } else { italic_blue.clone() }
+                )
             ]
         });
 

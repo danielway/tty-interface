@@ -15,7 +15,7 @@ fn main() -> tty_interface::result::Result<()> {
     let mut batch = tty.start_update();
     batch.set_line(0, Line {
         segments: vec![
-            Segment { text: "Hello, world!".to_string() }
+            Segment::new("Hello, world!".to_string())
         ]
     });
     tty.perform_update(batch)?;
