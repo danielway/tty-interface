@@ -10,7 +10,7 @@ fn main() -> tty_interface::result::Result<()> {
     let stdout = stdout();
     let mut stdout = stdout.lock().into_raw_mode().unwrap();
 
-    let mut tty = TTYInterface::new();
+    let mut tty = TTYInterface::new(&mut stdout);
 
     for i in 1..=10 {
         let mut batch = tty.start_update();
@@ -23,7 +23,7 @@ fn main() -> tty_interface::result::Result<()> {
             });
         }
 
-        tty.perform_update(&mut stdout, batch)?;
+        tty.perform_update(batch)?;
 
         std::thread::sleep(std::time::Duration::from_millis(500));
     }
@@ -37,7 +37,7 @@ fn main() -> tty_interface::result::Result<()> {
             ]
         });
 
-        tty.perform_update(&mut stdout, batch)?;
+        tty.perform_update(batch)?;
 
         std::thread::sleep(std::time::Duration::from_millis(250));
     }
@@ -45,10 +45,12 @@ fn main() -> tty_interface::result::Result<()> {
     for i in 0..10 {
         let mut batch = tty.start_update();
         batch.delete_line(9 - i);
-        tty.perform_update(&mut stdout, batch)?;
+        tty.perform_update(batch)?;
 
         std::thread::sleep(std::time::Duration::from_millis(100));
     }
 
-    tty.end(&mut stdout)
+    tty.end()?;
+
+    Ok(())
 }

@@ -1,6 +1,4 @@
-use termion::raw::RawTerminal;
 use std::io;
-use std::io::{Write, StdoutLock};
 
 use crate::cursor::CursorPosition;
 use crate::line::Line;
@@ -33,7 +31,7 @@ impl TTYInterface<'_> {
         UpdateBatch { steps: Vec::new() }
     }
 
-    pub fn perform_update(&mut self, stdout: &mut RawTerminal<StdoutLock>, batch: UpdateBatch) -> Result<()> {
+    pub fn perform_update(&mut self, batch: UpdateBatch) -> Result<()> {
         // Tracks cursor throughout update steps
         let mut update_cursor = self.state.cursor;
 
@@ -43,17 +41,17 @@ impl TTYInterface<'_> {
         }
 
         // Return cursor from working position to state-specified position
-        move_cursor_to(stdout, &mut update_cursor, &self.state.cursor)?;
+        move_cursor_to(self.writer, &mut update_cursor, &self.state.cursor)?;
 
-        stdout.flush()?;
+        self.writer.flush()?;
 
         Ok(())
     }
 
-    pub fn end(&self, stdout: &mut RawTerminal<StdoutLock>) -> Result<()> {
+    pub fn end(&mut self) -> Result<()> {
         // Advance the cursor past interface content
-        write!(stdout, "{}", "\n".repeat(self.state.lines.len()))?;
-        stdout.flush()?;
+        write!(self.writer, "{}", "\n".repeat(self.state.lines.len()))?;
+        self.writer.flush()?;
 
         Ok(())
     }

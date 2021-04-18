@@ -25,9 +25,9 @@ fn main() -> tty_interface::result::Result<()> {
         ]
     });
     batch.set_segment(0, 1, Segment { text: "llo".to_string() });
-    //tty.perform_update(&mut stdout, batch)?;
+    tty.perform_update(batch)?;
 
-    //tty.end(&mut stdout)
+    tty.end()?;
 
     Ok(())
 }
