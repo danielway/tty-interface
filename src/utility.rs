@@ -1,3 +1,5 @@
+//! Contains low-level functions for navigating and interacting-with the TTY terminal.
+
 use std::io;
 use termion::cursor;
 

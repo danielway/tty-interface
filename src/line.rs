@@ -1,3 +1,5 @@
+//! Describes a single line of the terminal user interface, which includes some number of segments.
+
 use crate::segment::Segment;
 use crate::cursor::CursorPosition;
 use crate::update::UpdateStep;
@@ -5,11 +7,13 @@ use crate::interface::TTYInterface;
 use crate::utility::{move_cursor_exact, render_line, move_cursor_by, clear_line};
 use crate::result::{Result, TTYError};
 
+/// A line in the terminal interface.
 pub struct Line {
     pub(crate) segments: Vec<Segment>,
 }
 
 impl Line {
+    /// Create a new line with the given list of segments.
     pub fn new(segments: Vec<Segment>) -> Line {
         Line { segments }
     }
@@ -24,6 +28,7 @@ impl Line {
     }
 }
 
+/// Describes a staged line change operation (either update or insert).
 pub(crate) struct SetLineStep {
     pub(crate) line_index: usize,
     pub(crate) line: Option<Line>,
@@ -35,6 +40,7 @@ impl UpdateStep for SetLineStep {
             return Err(TTYError::LineOutOfBounds);
         }
 
+        // Update or insert the line into the interface state
         let line = self.line.take().expect("SetLineStep is missing a Line");
         if self.line_index == interface.state.lines.len() {
             interface.state.lines.push(line);
@@ -50,6 +56,7 @@ impl UpdateStep for SetLineStep {
     }
 }
 
+/// Describes a staged line deletion.
 pub(crate) struct DeleteLineStep {
     pub(crate) line_index: usize,
 }

@@ -1,3 +1,5 @@
+//! Provides common result and error types for TTY Interface.
+
 use std::{fmt, error};
 use std::fmt::Formatter;
 use std::error::Error;
