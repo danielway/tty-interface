@@ -1,3 +1,6 @@
+//! Demonstrates an interface update with multiple steps, including a step which updates a segment
+//! already updated previously within the same batch. Omits any direct dependency on Termion.
+
 extern crate tty_interface;
 
 use tty_interface::interface::TTYInterface;
@@ -9,18 +12,21 @@ fn main() -> tty_interface::result::Result<()> {
     let mut tty = TTYInterface::new(&mut stdout);
 
     let mut batch = tty.start_update();
-    batch.set_line(0, Line {
-        segments: vec![
-            Segment::new("He".to_string()),
-            Segment::new("lo".to_string()),
-        ]
-    });
-    batch.set_line(1, Line {
-        segments: vec![
-            Segment::new("world!".to_string())
-        ]
-    });
+
+    // Line 0: "Helo"
+    batch.set_line(0, Line::new(vec![
+        Segment::new("He".to_string()),
+        Segment::new("lo".to_string()),
+    ]));
+
+    // Line 1: "world!"
+    batch.set_line(1, Line::new(
+        vec![ Segment::new("world!".to_string()) ]
+    ));
+
+    // Back to Line 0: "Hello" (updated the "lo" to "llo")
     batch.set_segment(0, 1, Segment::new("llo".to_string()));
+
     tty.perform_update(batch)?;
 
     tty.end()?;
