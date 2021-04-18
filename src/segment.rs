@@ -59,24 +59,35 @@ impl UpdateStep for SetSegmentStep {
             return Err(TTYError::SegmentOutOfBounds);
         }
 
-        // Determine if the updated segment has a different text length
-        let diff_length = interface.state.lines[self.line_index].segments[self.segment_index].text.len()
-            != self.segment.as_ref().unwrap().text.len();
+        // This is updating an existing segment
+        if self.segment_index < interface.state.lines[self.line_index].segments.len() {
+            // Determine if the updated segment has a different text length
+            let diff_length = interface.state.lines[self.line_index].segments[self.segment_index].text.len()
+                != self.segment.as_ref().unwrap().text.len();
 
-        // Update the interface state
-        interface.state.lines[self.line_index].segments[self.segment_index] = self.segment.take().unwrap();
+            // Update the interface state
+            interface.state.lines[self.line_index].segments[self.segment_index] = self.segment.take().unwrap();
 
-        // Handle rendering the segment
-        let segment_start = interface.state.lines[self.line_index].get_segment_start(self.segment_index);
-        move_cursor_exact(interface.writer, update_cursor, segment_start, self.line_index as u16)?;
-        render_segment(interface.writer, update_cursor, &interface.state.lines[self.line_index].segments[self.segment_index])?;
+            // Handle rendering the segment
+            let segment_start = interface.state.lines[self.line_index].get_segment_start(self.segment_index);
+            move_cursor_exact(interface.writer, update_cursor, segment_start, self.line_index as u16)?;
+            render_segment(interface.writer, update_cursor, &interface.state.lines[self.line_index].segments[self.segment_index])?;
 
-        // If the segment's length differed, we need to re-render segments to the right of this one
-        if diff_length {
-            clear_rest_of_line(interface.writer)?;
-            for segment in &interface.state.lines[self.line_index].segments[self.segment_index+1..] {
-                render_segment(interface.writer, update_cursor, segment)?;
+            // If the segment's length differed, we need to re-render segments to the right of this one
+            if diff_length {
+                clear_rest_of_line(interface.writer)?;
+                for segment in &interface.state.lines[self.line_index].segments[self.segment_index+1..] {
+                    render_segment(interface.writer, update_cursor, segment)?;
+                }
             }
+        } else {
+            // This is a completely new segment, so we can simply append
+            interface.state.lines[self.line_index].segments.push(self.segment.take().unwrap());
+
+            // Handle rendering the new segment
+            let segment_start = interface.state.lines[self.line_index].get_segment_start(self.segment_index);
+            move_cursor_exact(interface.writer, update_cursor, segment_start, self.line_index as u16)?;
+            render_segment(interface.writer, update_cursor, &interface.state.lines[self.line_index].segments[self.segment_index])?;
         }
 
         Ok(())
