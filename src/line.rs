@@ -6,10 +6,14 @@ use crate::utility::{move_cursor_exact, render_line, move_cursor_by, clear_line}
 use crate::result::{Result, TTYError};
 
 pub struct Line {
-    pub segments: Vec<Segment>,
+    pub(crate) segments: Vec<Segment>,
 }
 
 impl Line {
+    pub fn new(segments: Vec<Segment>) -> Line {
+        Line { segments }
+    }
+
     /// Returns the character position for the specified segment within the line.
     pub(crate) fn get_segment_start(&self, segment_index: usize) -> u16 {
         let mut segment_start = 0;
