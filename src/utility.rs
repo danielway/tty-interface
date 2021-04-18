@@ -84,7 +84,11 @@ pub(crate) fn render_line(writer: &mut dyn io::Write, cursor: &mut CursorPositio
 pub(crate) fn render_segment(writer: &mut dyn io::Write, cursor: &mut CursorPosition,
                              segment: &Segment) -> Result<()> {
     cursor.x += segment.text.len() as u16;
-    write!(writer, "{}", segment.text)?;
+
+    match &segment.format {
+        Some(format) => write!(writer, "{}{}{}", format.pre, segment.text, format.post)?,
+        None => write!(writer, "{}", segment.text)?,
+    }
 
     Ok(())
 }

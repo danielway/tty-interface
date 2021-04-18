@@ -4,10 +4,31 @@ use crate::interface::TTYInterface;
 use crate::utility::{clear_rest_of_line, move_cursor_exact, render_segment};
 use crate::result::{Result, TTYError};
 
+#[derive(Clone)]
+pub struct SegmentFormatting {
+    pub(crate) pre: String,
+    pub(crate) post: String,
+}
+
+impl SegmentFormatting {
+    pub fn new(pre: String, post: String) -> SegmentFormatting {
+        SegmentFormatting { pre, post }
+    }
+}
+
 pub struct Segment {
-    pub text: String,
-    // TODO: color
-    // TODO: style
+    pub(crate) text: String,
+    pub(crate) format: Option<SegmentFormatting>,
+}
+
+impl Segment {
+    pub fn new(text: String) -> Segment {
+        Segment { text, format: None }
+    }
+
+    pub fn new_formatted(text: String, format: SegmentFormatting) -> Segment {
+        Segment { text, format: Some(format) }
+    }
 }
 
 pub(crate) struct SetSegmentStep {
