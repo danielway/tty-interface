@@ -8,11 +8,11 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  publish:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
     - name: Publish
-      run: cargo publish ${{ secrets.CRATES_IO }}
+      run: cargo publish --token ${{ secrets.CRATES_IO }}
