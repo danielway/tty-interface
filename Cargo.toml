@@ -6,7 +6,7 @@ version = "3.0.0"
 license = "MIT"
 edition = "2021"
 repository = "https://github.com/danielway/tty-interface"
-
+exclude = [".github"]
 
 [dependencies]
 termion = "1.5.6"
