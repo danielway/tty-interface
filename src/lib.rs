@@ -1,18 +1,21 @@
-//! Provides simple TTY-based interface capabilities including partial re-renders of multi-line displays.
+//! Provides simple TTY-based interface capabilities through an accessible API. Stages changes to
+//! the interface until applied as a batch while minimizing writes to the output device.
 
-pub mod interface;
+extern crate core;
+
+pub mod config;
+pub mod device;
+pub mod format;
+pub mod layout;
 pub mod line;
+pub mod mode;
+pub mod position;
 pub mod segment;
-pub mod cursor;
-pub mod result;
-pub mod update;
 
-mod utility;
+mod interface;
+mod result;
+mod terminal;
+mod text;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+pub use crate::interface::Interface;
+pub use crate::result::{Error, Result};
