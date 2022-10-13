@@ -1,6 +1,4 @@
 /target
 Cargo.lock
-.idea
 *.sublime*
-*.iml
 .DS_Store
