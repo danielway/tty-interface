@@ -9,6 +9,6 @@ repository = "https://github.com/danielway/tty-interface"
 exclude = [".github"]
 
 [dependencies]
-termion = "1.5.6"
+crossterm = "0.25.0"
 unicode-segmentation = "1.9.0"
 unicode-width = "0.1.9"
