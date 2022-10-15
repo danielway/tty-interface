@@ -10,8 +10,8 @@ impl Vector {
     /// # Examples
     /// ```
     /// let size = tty_interface::Vector::new(7, 4);
-    /// assert_eq!(size.x(), 7);
-    /// assert_eq!(size.y(), 4);
+    /// assert_eq!(7, size.x());
+    /// assert_eq!(4, size.y());
     /// ```
     pub fn new(x: u16, y: u16) -> Vector {
         Vector { x, y }

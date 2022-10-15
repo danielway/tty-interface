@@ -16,3 +16,4 @@ mod result;
 pub use result::{Result, Error};
 
 mod state;
+pub(crate) use state::State;

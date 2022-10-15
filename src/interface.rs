@@ -3,14 +3,14 @@ use std::{io::{Stdout, stdout, Write}, mem::swap};
 use crossterm::{terminal, queue, cursor, style};
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::{Position, Vector, Result};
+use crate::{Position, Vector, Result, State};
 
 /// A TTY-based user-interface providing optimized update rendering.
 pub struct Interface {
     stdout: Stdout,
     size: Vector,
-    current_cells: Vec<Vec<String>>,
-    alternate_cells: Option<Vec<Vec<String>>>,
+    current: State,
+    alternate: Option<State>,
 }
 
 impl Interface {
@@ -24,18 +24,17 @@ impl Interface {
     /// ```
     pub fn new() -> Result<Interface> {
         let (columns, lines) = terminal::size()?;
-        
-        let mut cells = Vec::new();
-        for _ in 0..lines {
-            cells.push(vec![String::new(); columns.into()]);
-        }
 
-        let interface = Interface {
+        let mut interface = Interface {
             stdout: stdout(),
             size: Vector::new(columns, lines),
-            current_cells: cells,
-            alternate_cells: None,
+            current: State::new(),
+            alternate: None,
         };
+
+        terminal::enable_raw_mode()?;
+        queue!(interface.stdout, terminal::Clear(terminal::ClearType::All))?;
+        queue!(interface.stdout, cursor::MoveTo(0, 0))?;
 
         Ok(interface)
     }
@@ -50,10 +49,10 @@ impl Interface {
     /// interface.set(Position::new(1, 1), "Hello, world!");
     /// ```
     pub fn set(&mut self, position: Position, text: &str) {
-        let alternate_cells = self.alternate_cells.get_or_insert_with(|| self.current_cells.clone());
+        let alternate = self.alternate.get_or_insert_with(|| self.current.clone());
 
-        let mut line: usize = position.y().into();
-        let mut column: usize = position.x().into();
+        let mut line = position.y().into();
+        let mut column = position.x().into();
 
         for grapheme in text.graphemes(true) {
             if column > self.size.x().into() {
@@ -61,7 +60,7 @@ impl Interface {
                 line += 1;
             }
 
-            alternate_cells[line][column] = grapheme.to_string();
+            alternate.set(Position::new(column, line), grapheme.to_string());
 
             column += 1;
         }
@@ -78,23 +77,21 @@ impl Interface {
     /// interface.apply().expect("updates should be valid");
     /// ```
     pub fn apply(&mut self) -> Result<()> {
-        if self.alternate_cells.is_none() {
+        if self.alternate.is_none() {
             return Ok(())
         }
 
-        let mut alternate = self.alternate_cells.take().unwrap();
-        swap(&mut self.current_cells, &mut alternate);
+        let mut alternate = self.alternate.take().unwrap();
+        swap(&mut self.current, &mut alternate);
 
-        queue!(self.stdout, terminal::Clear(terminal::ClearType::All))?;
-        for line in 0..self.size.y().into() {
-            for column in 0..self.size.x().into() {
-                let text = &self.current_cells[line][column];
-                queue!(self.stdout, cursor::MoveTo(column as u16, line as u16))?;
-                queue!(self.stdout, style::Print(text))?;
-            }
+        for (position, text) in self.current.dirty_iter() {
+            queue!(self.stdout, cursor::MoveTo(position.x(), position.y()))?;
+            queue!(self.stdout, style::Print(text))?;
         }
 
         self.stdout.flush()?;
+
+        self.current.clear_dirty();
         
         Ok(())
     }
