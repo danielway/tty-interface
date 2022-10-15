@@ -105,4 +105,20 @@ mod tests {
         assert_eq!("B", state.cells[&pos!(2, 0)]);
         assert_eq!("C", state.cells[&pos!(1, 1)]);
     }
+
+    #[test]
+    fn state_dirty_iter() {
+        let mut state = State::new();
+
+        state.set(pos!(0, 0), "A");
+        state.clear_dirty();
+
+        state.set(pos!(2, 0), "B");
+        state.set(pos!(1, 1), "C");
+
+        let mut iter = state.dirty_iter();
+        assert_eq!(Some((pos!(2, 0), "B")), iter.next());
+        assert_eq!(Some((pos!(1, 1), "C")), iter.next());
+        assert_eq!(None, iter.next());
+    }
 }
