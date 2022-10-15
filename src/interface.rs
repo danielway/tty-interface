@@ -39,6 +39,11 @@ impl Interface {
         Ok(interface)
     }
 
+    pub fn exit(&self) -> Result<()> {
+        terminal::disable_raw_mode()?;
+        Ok(())
+    }
+
     /// Update the interface's text at the specified position. Changes are staged until applied.
     /// 
     /// # Examples
@@ -60,7 +65,7 @@ impl Interface {
                 line += 1;
             }
 
-            alternate.set(Position::new(column, line), grapheme.to_string());
+            alternate.set(Position::new(column, line), grapheme);
 
             column += 1;
         }

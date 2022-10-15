@@ -1,5 +1,22 @@
 use std::fmt::Debug;
 
+/// Create a new, immutable position (column, line);
+/// 
+/// # Examples
+/// ```
+/// use tty_interface::{Position, pos};
+/// 
+/// let position = pos!(1, 2);
+/// assert_eq!(1, position.x());
+/// assert_eq!(2, position.y());
+/// ```
+#[macro_export]
+macro_rules! pos {
+    ($x: expr, $y: expr) => {
+        Position::new($x, $y)
+    };
+}
+
 /// A coordinate position in the terminal. May be absolute or relative to some buffer's origin.
 #[derive(Eq, PartialEq, Copy, Clone)]
 pub struct Position {
@@ -12,7 +29,9 @@ impl Position {
     /// 
     /// # Examples
     /// ```
-    /// let origin = tty_interface::Position::new(2, 4);
+    /// use tty_interface::Position;
+    /// 
+    /// let origin = Position::new(2, 4);
     /// assert_eq!(2, origin.x());
     /// assert_eq!(4, origin.y());
     /// ```

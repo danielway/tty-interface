@@ -19,8 +19,8 @@ impl State {
     }
 
     /// Update a particular cell's grapheme.
-    pub(crate) fn set(&mut self, position: Position, grapheme: String) {
-        self.cells.insert(position, grapheme);
+    pub(crate) fn set(&mut self, position: Position, grapheme: &str) {
+        self.cells.insert(position, grapheme.to_string());
         self.dirty.insert(position);
     }
 
@@ -63,5 +63,46 @@ impl<'a> Iterator for StateIter<'a> {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{Position, pos};
+
+    use super::State;
+
+    #[test]
+    fn state_set() {
+        let mut state = State::new();
+
+        state.set(pos!(0, 0), "A");
+        state.set(pos!(2, 0), "B");
+        state.set(pos!(1, 1), "C");
+
+        assert_eq!(3, state.cells.len());
+        assert_eq!("A", state.cells[&pos!(0, 0)]);
+        assert_eq!("B", state.cells[&pos!(2, 0)]);
+        assert_eq!("C", state.cells[&pos!(1, 1)]);
+
+        let dirty_positions: Vec<_> = state.dirty.clone().into_iter().collect();
+        assert_eq!(3, dirty_positions.len());
+        assert_eq!(pos!(0, 0), dirty_positions[0]);
+        assert_eq!(pos!(2, 0), dirty_positions[1]);
+        assert_eq!(pos!(1, 1), dirty_positions[2]);
+    }
+
+    #[test]
+    fn state_clear_dirty() {
+        let mut state = State::new();
+
+        state.set(pos!(0, 0), "A");
+        state.set(pos!(2, 0), "B");
+        state.set(pos!(1, 1), "C");
+
+        assert_eq!(3, state.cells.len());
+        assert_eq!("A", state.cells[&pos!(0, 0)]);
+        assert_eq!("B", state.cells[&pos!(2, 0)]);
+        assert_eq!("C", state.cells[&pos!(1, 1)]);
     }
 }
