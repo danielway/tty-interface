@@ -49,8 +49,8 @@ impl StateIter<'_> {
     }
 }
 
-impl<'a> Iterator for StateIter<'a> {
-    type Item = (Position, &'a str);
+impl<'a> Iterator for StateIter<'_> {
+    type Item = (Position, String);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.positions.len() {
@@ -59,7 +59,7 @@ impl<'a> Iterator for StateIter<'a> {
             
             self.index += 1;
             
-            Some((position, text))
+            Some((position, text.clone()))
         } else {
             None
         }
@@ -101,9 +101,9 @@ mod tests {
         state.set(pos!(1, 1), "C");
 
         assert_eq!(3, state.cells.len());
-        assert_eq!("A", state.cells[&pos!(0, 0)]);
-        assert_eq!("B", state.cells[&pos!(2, 0)]);
-        assert_eq!("C", state.cells[&pos!(1, 1)]);
+        assert_eq!("A", &state.cells[&pos!(0, 0)]);
+        assert_eq!("B", &state.cells[&pos!(2, 0)]);
+        assert_eq!("C", &state.cells[&pos!(1, 1)]);
     }
 
     #[test]
@@ -117,8 +117,8 @@ mod tests {
         state.set(pos!(1, 1), "C");
 
         let mut iter = state.dirty_iter();
-        assert_eq!(Some((pos!(2, 0), "B")), iter.next());
-        assert_eq!(Some((pos!(1, 1), "C")), iter.next());
+        assert_eq!(Some((pos!(2, 0), "B".to_string())), iter.next());
+        assert_eq!(Some((pos!(1, 1), "C".to_string())), iter.next());
         assert_eq!(None, iter.next());
     }
 }

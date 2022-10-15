@@ -7,7 +7,7 @@ fn main() {
 }
 
 fn execute() -> Result<()> {
-    let mut interface = Interface::new()?;
+    let mut interface = Interface::for_stdout()?;
 
     interface.set(pos!(0, 0), "Hello, world!");
     interface.set(pos!(5, 2), "Let's count to 10:");
