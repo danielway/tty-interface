@@ -25,7 +25,7 @@ impl Interface<'_> {
     /// Create a new interface for stdout.
     ///
     /// # Examples
-    /// ```
+    /// ```no_run
     /// use tty_interface::Interface;
     ///
     /// let interface = Interface::for_stdout()
