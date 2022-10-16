@@ -1,7 +1,7 @@
 use tty_interface::{self, pos, Color, Interface, Position, Style};
 use vt100::Parser;
 
-#[test] #[ignore] // TODO: These fail in CI.
+#[test]
 fn basic_write() {
     let mut parser = Parser::default();
 
@@ -12,7 +12,7 @@ fn basic_write() {
     assert_eq!("Hello, world!", &parser.screen().contents());
 }
 
-#[test] #[ignore] // TODO: These fail in CI.
+#[test]
 fn multiple_writes() {
     let mut parser = Parser::default();
 
@@ -30,7 +30,7 @@ fn multiple_writes() {
     assert_eq!("Line 1 with more\nLine 2", &parser.screen().contents());
 }
 
-#[test] #[ignore] // TODO: These fail in CI.
+#[test]
 fn overlapping_writes() {
     let mut parser = Parser::default();
 
@@ -48,7 +48,7 @@ fn overlapping_writes() {
     assert_eq!("AXCZZF", &parser.screen().contents());
 }
 
-#[test] #[ignore] // TODO: These fail in CI.
+#[test]
 fn multiple_overlapping_formatted_writes() {
     let mut parser = Parser::default();
 
