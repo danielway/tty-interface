@@ -15,4 +15,3 @@ unicode-width = "0.1.9"
 
 [dev-dependencies]
 vt100 = "0.15.1"
-serial_test = "0.9.0"
