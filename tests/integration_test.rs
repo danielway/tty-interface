@@ -2,6 +2,7 @@ use tty_interface::{self, pos, Color, Interface, Position, Style};
 use vt100::Parser;
 
 #[test]
+#[ignore]
 fn basic_write() {
     let mut parser = Parser::default();
 
