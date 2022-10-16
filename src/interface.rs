@@ -65,7 +65,7 @@ impl Interface<'_> {
             alternate: None,
         };
 
-        terminal::enable_raw_mode()?;
+        // terminal::enable_raw_mode()?;
 
         let writer = interface.writer();
         writer.queue(terminal::Clear(terminal::ClearType::All))?;
@@ -76,7 +76,7 @@ impl Interface<'_> {
 
     /// When finished using this interface, uninitialize its terminal configuration.
     pub fn exit(self) -> Result<()> {
-        terminal::disable_raw_mode()?;
+        // terminal::disable_raw_mode()?;
         println!();
         Ok(())
     }
