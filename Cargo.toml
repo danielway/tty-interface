@@ -8,6 +8,10 @@ edition = "2021"
 repository = "https://github.com/danielway/tty-interface"
 exclude = [".github"]
 
+# This is necessary for functional testing in CI. See https://github.com/dankamongmen/notcurses/issues/766
+[alias]
+t = "test -- --test-threads 1"
+
 [dependencies]
 crossterm = "0.25.0"
 unicode-segmentation = "1.9.0"
