@@ -28,7 +28,8 @@ impl Interface<'_> {
     /// ```
     /// use tty_interface::Interface;
     ///
-    /// let interface = Interface::for_stdout().expect("terminal size should be available");
+    /// let interface = Interface::for_stdout()
+    ///     .expect("terminal size should be available");
     /// ```
     pub fn for_stdout<'a>() -> Result<Interface<'a>> {
         Self::new(None, Some(stdout()))
@@ -39,10 +40,14 @@ impl Interface<'_> {
     /// # Examples
     /// ```
     /// use tty_interface::Interface;
-    /// use std::io::{Write, stdout};
+    /// use std::io::Write;
+    /// use vt100::Parser;
     ///
-    /// let writer: &mut dyn Write = &mut stdout();
-    /// let interface = Interface::for_writer(writer).expect("terminal size should be available");
+    /// let mut parser = Parser::default();
+    /// 
+    /// let writer: &mut dyn Write = &mut parser;
+    /// let interface = Interface::for_writer(writer)
+    ///     .expect("terminal size should be available");
     /// ```
     pub fn for_writer(writer: &mut dyn Write) -> Result<Interface> {
         Self::new(Some(writer), None)
@@ -81,8 +86,12 @@ impl Interface<'_> {
     /// # Examples
     /// ```
     /// use tty_interface::{Interface, Position, pos};
+    /// use vt100::Parser;
     ///
-    /// let mut interface = Interface::for_stdout().expect("terminal size should be available");
+    /// let mut parser = Parser::default();
+    /// let mut interface = Interface::for_writer(&mut parser)
+    ///     .expect("terminal size should be available");
+    /// 
     /// interface.set(pos!(1, 1), "Hello, world!");
     /// ```
     pub fn set(&mut self, position: Position, text: &str) {
@@ -94,8 +103,12 @@ impl Interface<'_> {
     /// # Examples
     /// ```
     /// use tty_interface::{Interface, Position, pos, Style};
+    /// use vt100::Parser;
     ///
-    /// let mut interface = Interface::for_stdout().expect("terminal size should be available");
+    /// let mut parser = Parser::default();
+    /// let mut interface = Interface::for_writer(&mut parser)
+    ///     .expect("terminal size should be available");
+    ///
     /// interface.set_styled(pos!(1, 1), "Hello, world!", Style::default().set_bold(true));
     /// ```
     pub fn set_styled(&mut self, position: Position, text: &str, style: Style) {
@@ -130,8 +143,12 @@ impl Interface<'_> {
     /// # Examples
     /// ```
     /// use tty_interface::{Interface, Position, pos};
+    /// use vt100::Parser;
     ///
-    /// let mut interface = Interface::for_stdout().expect("terminal size should be available");
+    /// let mut parser = Parser::default();
+    /// let mut interface = Interface::for_writer(&mut parser)
+    ///     .expect("terminal size should be available");
+    ///
     /// interface.set(pos!(1, 1), "Hello, world!");
     /// interface.apply().expect("updates should be valid");
     /// ```

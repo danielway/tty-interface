@@ -9,7 +9,9 @@ impl Vector {
     ///
     /// # Examples
     /// ```
-    /// let size = tty_interface::Vector::new(7, 4);
+    /// use tty_interface::Vector;
+    /// 
+    /// let size = Vector::new(7, 4);
     /// assert_eq!(7, size.x());
     /// assert_eq!(4, size.y());
     /// ```
