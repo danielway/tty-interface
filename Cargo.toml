@@ -2,7 +2,7 @@
 description = "Provides simple TTY-based interface capabilities including partial re-renders of multi-line displays."
 authors = ["Daniel Way <contact@danieldway.com>"]
 name = "tty-interface"
-version = "3.0.0"
+version = "4.0.0-beta.0"
 license = "MIT"
 edition = "2021"
 repository = "https://github.com/danielway/tty-interface"
