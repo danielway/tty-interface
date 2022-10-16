@@ -1,7 +1,7 @@
 //! # tty-interface
-//! 
+//!
 //! Provides simple TTY-based user interface capabilities including partial re-renders of multi-line displays.
-//! 
+//!
 
 mod position;
 pub use position::Position;
@@ -13,7 +13,10 @@ mod interface;
 pub use interface::Interface;
 
 mod result;
-pub use result::{Result, Error};
+pub use result::{Error, Result};
+
+mod style;
+pub use style::{Color, Style};
 
 mod state;
-pub(crate) use state::State;
+pub(crate) use state::{Cell, State};

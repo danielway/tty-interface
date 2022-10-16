@@ -1,6 +1,6 @@
 use std::{thread::sleep, time::Duration};
 
-use tty_interface::{Interface, Result, Position, pos};
+use tty_interface::{pos, Interface, Position, Result};
 
 fn main() {
     execute().expect("execute basic example");

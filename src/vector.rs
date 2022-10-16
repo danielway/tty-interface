@@ -6,7 +6,7 @@ pub struct Vector {
 
 impl Vector {
     /// Create a new, immutable vector.
-    /// 
+    ///
     /// # Examples
     /// ```
     /// let size = tty_interface::Vector::new(7, 4);
@@ -21,7 +21,7 @@ impl Vector {
     pub fn x(&self) -> u16 {
         self.x
     }
-    
+
     /// This vector's line value.
     pub fn y(&self) -> u16 {
         self.y
