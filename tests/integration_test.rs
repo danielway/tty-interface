@@ -1,7 +1,9 @@
+use serial_test::serial;
 use tty_interface::{self, pos, Color, Interface, Position, Style};
 use vt100::Parser;
 
 #[test]
+#[serial]
 fn basic_write() {
     let mut parser = Parser::default();
 
@@ -13,6 +15,7 @@ fn basic_write() {
 }
 
 #[test]
+#[serial]
 fn multiple_writes() {
     let mut parser = Parser::default();
 
@@ -31,6 +34,7 @@ fn multiple_writes() {
 }
 
 #[test]
+#[serial]
 fn overlapping_writes() {
     let mut parser = Parser::default();
 
@@ -49,6 +53,7 @@ fn overlapping_writes() {
 }
 
 #[test]
+#[serial]
 fn multiple_overlapping_formatted_writes() {
     let mut parser = Parser::default();
 
