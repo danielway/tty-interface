@@ -55,7 +55,8 @@ impl Interface<'_> {
 
     /// Create a new interface with the specified writer or stdout device. Initializes the terminal.
     fn new(writer: Option<&mut dyn Write>, stdout: Option<Stdout>) -> Result<Interface> {
-        let (columns, lines) = terminal::size()?;
+        // let (columns, lines) = terminal::size()?;
+        let (columns, lines) = (80, 30);
 
         let mut interface = Interface {
             writer,
