@@ -1,7 +1,4 @@
-use std::{
-    io::{stdout, Stdout, Write},
-    mem::swap,
-};
+use std::mem::swap;
 
 use crossterm::{
     cursor,
@@ -10,74 +7,60 @@ use crossterm::{
 };
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::{pos, Cell, Color, Position, Result, State, Style, Vector};
+use crate::{pos, Cell, Color, Device, Position, Result, State, Style, Vector};
 
 /// A TTY-based user-interface providing optimized update rendering.
 pub struct Interface<'a> {
-    writer: Option<&'a mut dyn Write>,
-    stdout: Option<Stdout>,
+    device: &'a mut dyn Device,
     size: Vector,
     current: State,
     alternate: Option<State>,
 }
 
 impl Interface<'_> {
-    /// Create a new interface for stdout.
-    ///
-    /// # Examples
-    /// ```no_run
-    /// use tty_interface::Interface;
-    ///
-    /// let interface = Interface::for_stdout()
-    ///     .expect("terminal size should be available");
-    /// ```
-    pub fn for_stdout<'a>() -> Result<Interface<'a>> {
-        Self::new(None, Some(stdout()))
-    }
-
-    /// Create a new interface for the specified writer.
+    /// Create a new interface for the specified device.
     ///
     /// # Examples
     /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
     /// use tty_interface::Interface;
-    /// use std::io::Write;
-    /// use vt100::Parser;
     ///
-    /// let mut parser = Parser::default();
-    /// 
-    /// let writer: &mut dyn Write = &mut parser;
-    /// let interface = Interface::for_writer(writer)
-    ///     .expect("terminal size should be available");
+    /// let interface = Interface::new(&mut device)?;
+    /// # Ok::<(), Error>(())
     /// ```
-    pub fn for_writer(writer: &mut dyn Write) -> Result<Interface> {
-        Self::new(Some(writer), None)
-    }
-
-    /// Create a new interface with the specified writer or stdout device. Initializes the terminal.
-    fn new(writer: Option<&mut dyn Write>, stdout: Option<Stdout>) -> Result<Interface> {
-        // let (columns, lines) = terminal::size()?;
-        let (columns, lines) = (80, 30);
+    pub fn new<'a>(device: &'a mut dyn Device) -> Result<Interface<'a>> {
+        let size = device.get_terminal_size()?;
 
         let mut interface = Interface {
-            writer,
-            stdout,
-            size: Vector::new(columns, lines),
+            device,
+            size,
             current: State::new(),
             alternate: None,
         };
 
-        // terminal::enable_raw_mode()?;
-
-        let writer = interface.writer();
-        writer.queue(terminal::Clear(terminal::ClearType::All))?;
-        writer.queue(cursor::MoveTo(0, 0))?;
+        let device = &mut interface.device;
+        device.enable_raw_mode()?;
+        device.queue(terminal::Clear(terminal::ClearType::All))?;
+        device.queue(cursor::MoveTo(0, 0))?;
 
         Ok(interface)
     }
 
     /// When finished using this interface, uninitialize its terminal configuration.
+    ///
+    /// # Examples
+    /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
+    /// use tty_interface::Interface;
+    ///
+    /// let interface = Interface::new(&mut device)?;
+    /// interface.exit()?;
+    /// # Ok::<(), Error>(())
+    /// ```
     pub fn exit(self) -> Result<()> {
-        // terminal::disable_raw_mode()?;
+        self.device.disable_raw_mode()?;
         println!();
         Ok(())
     }
@@ -86,14 +69,13 @@ impl Interface<'_> {
     ///
     /// # Examples
     /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Position, pos};
-    /// use vt100::Parser;
     ///
-    /// let mut parser = Parser::default();
-    /// let mut interface = Interface::for_writer(&mut parser)
-    ///     .expect("terminal size should be available");
-    /// 
+    /// let mut interface = Interface::new(&mut device)?;
     /// interface.set(pos!(1, 1), "Hello, world!");
+    /// # Ok::<(), Error>(())
     /// ```
     pub fn set(&mut self, position: Position, text: &str) {
         self.stage_text(position, text, None)
@@ -103,14 +85,13 @@ impl Interface<'_> {
     ///
     /// # Examples
     /// ```
-    /// use tty_interface::{Interface, Position, pos, Style};
-    /// use vt100::Parser;
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
+    /// use tty_interface::{Interface, Style, Position, pos};
     ///
-    /// let mut parser = Parser::default();
-    /// let mut interface = Interface::for_writer(&mut parser)
-    ///     .expect("terminal size should be available");
-    ///
+    /// let mut interface = Interface::new(&mut device)?;
     /// interface.set_styled(pos!(1, 1), "Hello, world!", Style::default().set_bold(true));
+    /// # Ok::<(), Error>(())
     /// ```
     pub fn set_styled(&mut self, position: Position, text: &str, style: Style) {
         self.stage_text(position, text, Some(style))
@@ -143,15 +124,14 @@ impl Interface<'_> {
     ///
     /// # Examples
     /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Position, pos};
-    /// use vt100::Parser;
     ///
-    /// let mut parser = Parser::default();
-    /// let mut interface = Interface::for_writer(&mut parser)
-    ///     .expect("terminal size should be available");
-    ///
+    /// let mut interface = Interface::new(&mut device)?;
     /// interface.set(pos!(1, 1), "Hello, world!");
-    /// interface.apply().expect("updates should be valid");
+    /// interface.apply()?;
+    /// # Ok::<(), Error>(())
     /// ```
     pub fn apply(&mut self) -> Result<()> {
         if self.alternate.is_none() {
@@ -163,9 +143,9 @@ impl Interface<'_> {
 
         let dirty_cells: Vec<(Position, Cell)> = self.current.dirty_iter().collect();
 
-        let writer = self.writer();
         for (position, cell) in dirty_cells {
-            writer.queue(cursor::MoveTo(position.x(), position.y()))?;
+            self.device
+                .queue(cursor::MoveTo(position.x(), position.y()))?;
 
             let mut content_style = ContentStyle::default();
             if let Some(style) = cell.style() {
@@ -173,25 +153,15 @@ impl Interface<'_> {
             }
 
             let styled_content = StyledContent::new(content_style, cell.grapheme());
-            writer.queue(style::PrintStyledContent(styled_content))?;
+            self.device
+                .queue(style::PrintStyledContent(styled_content))?;
         }
 
-        writer.flush()?;
+        self.device.flush()?;
 
         self.current.clear_dirty();
 
         Ok(())
-    }
-
-    /// Get the appropriate output writer for this interface.
-    fn writer(&mut self) -> &mut dyn Write {
-        if let Some(writer) = self.writer.as_mut() {
-            writer
-        } else if let Some(stdout) = self.stdout.as_mut() {
-            stdout
-        } else {
-            panic!("interface has no output writer")
-        }
     }
 }
 

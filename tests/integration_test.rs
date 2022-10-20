@@ -1,24 +1,20 @@
-use tty_interface::{self, pos, Color, Interface, Position, Style};
-use vt100::Parser;
+use tty_interface::{self, pos, test::VirtualDevice, Color, Interface, Position, Style};
 
 #[test]
-#[ignore]
 fn basic_write() {
-    let mut parser = Parser::default();
+    let mut device = VirtualDevice::new();
+    let mut interface = Interface::new(&mut device).unwrap();
 
-    let mut interface = Interface::for_writer(&mut parser).unwrap();
     interface.set(pos!(0, 0), "Hello, world!");
     interface.apply().unwrap();
 
-    assert_eq!("Hello, world!", &parser.screen().contents());
+    assert_eq!("Hello, world!", &device.parser().screen().contents());
 }
 
 #[test]
-#[ignore]
 fn multiple_writes() {
-    let mut parser = Parser::default();
-
-    let mut interface = Interface::for_writer(&mut parser).unwrap();
+    let mut device = VirtualDevice::new();
+    let mut interface = Interface::new(&mut device).unwrap();
 
     interface.set(pos!(0, 0), "Line 1");
     interface.apply().unwrap();
@@ -29,15 +25,16 @@ fn multiple_writes() {
     interface.set(pos!(7, 0), "with more");
     interface.apply().unwrap();
 
-    assert_eq!("Line 1 with more\nLine 2", &parser.screen().contents());
+    assert_eq!(
+        "Line 1 with more\nLine 2",
+        &device.parser().screen().contents()
+    );
 }
 
 #[test]
-#[ignore]
 fn overlapping_writes() {
-    let mut parser = Parser::default();
-
-    let mut interface = Interface::for_writer(&mut parser).unwrap();
+    let mut device = VirtualDevice::new();
+    let mut interface = Interface::new(&mut device).unwrap();
 
     interface.set(pos!(0, 0), "ABCDEF");
     interface.apply().unwrap();
@@ -48,15 +45,13 @@ fn overlapping_writes() {
     interface.set(pos!(3, 0), "ZZ");
     interface.apply().unwrap();
 
-    assert_eq!("AXCZZF", &parser.screen().contents());
+    assert_eq!("AXCZZF", &device.parser().screen().contents());
 }
 
 #[test]
-#[ignore]
 fn multiple_overlapping_formatted_writes() {
-    let mut parser = Parser::default();
-
-    let mut interface = Interface::for_writer(&mut parser).unwrap();
+    let mut device = VirtualDevice::new();
+    let mut interface = Interface::new(&mut device).unwrap();
 
     interface.set_styled(pos!(0, 0), "FIRST", Style::default().set_bold(true));
     interface.apply().unwrap();
@@ -86,10 +81,10 @@ fn multiple_overlapping_formatted_writes() {
         vt100::Color::Idx(9),
     ];
 
-    assert_eq!("FISETHIRD", &parser.screen().contents());
+    assert_eq!("FISETHIRD", &device.parser().screen().contents());
 
     for column in 0..expected_text.len() {
-        let cell = parser.screen().cell(0, column as u16).unwrap();
+        let cell = device.parser().screen().cell(0, column as u16).unwrap();
         assert_eq!(expected_text[column], cell.contents());
         assert_eq!(expected_bold[column], cell.bold());
         assert_eq!(expected_italic[column], cell.italic());
