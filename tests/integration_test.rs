@@ -91,3 +91,19 @@ fn multiple_overlapping_formatted_writes() {
         assert_eq!(expected_color[column], cell.fgcolor())
     }
 }
+
+#[test]
+fn clearing() {
+    let mut device = VirtualDevice::new();
+    let mut interface = Interface::new(&mut device).unwrap();
+
+    interface.set(pos!(0, 0), "ABC");
+    interface.set(pos!(0, 1), "DEF");
+    interface.set(pos!(0, 2), "GHI");
+    interface.apply().unwrap();
+
+    interface.clear_line(1);
+    interface.apply().unwrap();
+
+    assert_eq!("ABC\n   \nGHI", &device.parser().screen().contents());
+}
