@@ -63,9 +63,12 @@ impl State {
 
     /// Clears all cells in the specified line.
     pub(crate) fn clear_line(&mut self, line: u16) {
-        let deleted_cell_positions: Vec<Position> = self.cells.keys()
+        let deleted_cell_positions: Vec<Position> = self
+            .cells
+            .keys()
             .filter(|position| position.y() == line)
-            .map(|position| *position).collect();
+            .map(|position| *position)
+            .collect();
 
         for position in deleted_cell_positions {
             self.cells.remove(&position);
@@ -103,16 +106,19 @@ impl StateIter<'_> {
 }
 
 impl<'a> Iterator for StateIter<'_> {
-    type Item = (Position, Cell);
+    type Item = (Position, Option<Cell>);
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.positions.len() {
             let position = self.positions[self.index];
-            let cell = &self.state.cells[&position];
+            let cell = self
+                .state
+                .cells
+                .get(&position)
+                .and_then(|cell| Some(cell.clone()));
 
             self.index += 1;
-
-            Some((position, cell.clone()))
+            Some((position, cell))
         } else {
             None
         }
@@ -297,25 +303,28 @@ mod tests {
 
         state.set_text(pos!(2, 0), "B");
         state.set_text(pos!(1, 1), "C");
+        state.set_text(pos!(0, 2), "D");
+        state.clear_line(1);
 
         let mut iter = state.dirty_iter();
         assert_eq!(
             Some((
                 pos!(2, 0),
-                Cell {
+                Some(Cell {
                     grapheme: "B".to_string(),
                     style: None
-                }
+                })
             )),
             iter.next()
         );
+        assert_eq!(Some((pos!(1, 1), None,)), iter.next());
         assert_eq!(
             Some((
-                pos!(1, 1),
-                Cell {
-                    grapheme: "C".to_string(),
+                pos!(0, 2),
+                Some(Cell {
+                    grapheme: "D".to_string(),
                     style: None
-                }
+                })
             )),
             iter.next()
         );
