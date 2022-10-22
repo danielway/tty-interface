@@ -61,6 +61,18 @@ impl State {
         );
     }
 
+    /// Clears all cells in the specified line.
+    pub(crate) fn clear_line(&mut self, line: u16) {
+        let deleted_cell_positions: Vec<Position> = self.cells.keys()
+            .filter(|position| position.y() == line)
+            .map(|position| *position).collect();
+
+        for position in deleted_cell_positions {
+            self.cells.remove(&position);
+            self.dirty.insert(position);
+        }
+    }
+
     /// Marks any dirty cells as clean.
     pub(crate) fn clear_dirty(&mut self) {
         self.dirty.clear()
@@ -191,6 +203,57 @@ mod tests {
         assert_eq!(pos!(0, 0), dirty_positions[0]);
         assert_eq!(pos!(2, 2), dirty_positions[1]);
         assert_eq!(pos!(1, 3), dirty_positions[2]);
+    }
+
+    #[test]
+    fn state_clear_line() {
+        let mut state = State::new();
+
+        state.set_text(pos!(0, 0), "A");
+        state.set_text(pos!(2, 0), "B");
+        state.set_text(pos!(1, 1), "C");
+        state.set_text(pos!(3, 1), "D");
+        state.clear_dirty();
+
+        assert_eq!(4, state.cells.len());
+        assert_eq!(
+            Cell {
+                grapheme: "A".to_string(),
+                style: None
+            },
+            state.cells[&pos!(0, 0)]
+        );
+        assert_eq!(
+            Cell {
+                grapheme: "B".to_string(),
+                style: None
+            },
+            state.cells[&pos!(2, 0)]
+        );
+        assert_eq!(
+            Cell {
+                grapheme: "C".to_string(),
+                style: None
+            },
+            state.cells[&pos!(1, 1)]
+        );
+        assert_eq!(
+            Cell {
+                grapheme: "D".to_string(),
+                style: None
+            },
+            state.cells[&pos!(3, 1)]
+        );
+
+        state.clear_line(1);
+
+        let dirty_positions: Vec<_> = state.dirty.clone().into_iter().collect();
+        assert_eq!(2, dirty_positions.len());
+        assert_eq!(pos!(1, 1), dirty_positions[0]);
+        assert_eq!(pos!(3, 1), dirty_positions[1]);
+
+        let line_two_cell_count = state.cells.keys().filter(|pos| pos.y() == 1).count();
+        assert_eq!(0, line_two_cell_count);
     }
 
     #[test]
