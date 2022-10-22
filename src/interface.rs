@@ -43,9 +43,11 @@ impl Interface<'_> {
 
         let device = &mut interface.device;
         device.enable_raw_mode()?;
+        device.queue(terminal::EnterAlternateScreen)?;
         device.queue(terminal::Clear(terminal::ClearType::All))?;
         device.queue(cursor::Hide)?;
         device.queue(cursor::MoveTo(0, 0))?;
+        device.flush()?;
 
         Ok(interface)
     }
@@ -64,6 +66,9 @@ impl Interface<'_> {
     /// ```
     pub fn exit(self) -> Result<()> {
         self.device.disable_raw_mode()?;
+        self.device.queue(terminal::LeaveAlternateScreen)?;
+        self.device.flush()?;
+
         println!();
         Ok(())
     }
