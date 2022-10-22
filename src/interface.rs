@@ -100,6 +100,31 @@ impl Interface<'_> {
         self.stage_text(position, text, Some(style))
     }
 
+    /// Clear all text on the specified line. Changes are staged until applied.
+    ///
+    /// # Examples
+    /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
+    /// use tty_interface::{Interface, Style, Position, pos};
+    ///
+    /// let mut interface = Interface::new(&mut device)?;
+    ///
+    /// // Write "Hello," and "world!" on two different lines
+    /// interface.set(pos!(0, 0), "Hello,");
+    /// interface.set(pos!(0, 1), "world!");
+    /// interface.apply()?;
+    ///
+    /// // Clear the second line, "world!"
+    /// interface.clear_line(1);
+    /// interface.apply()?;
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn clear_line(&mut self, line: u16) {
+        let alternate = self.alternate.get_or_insert_with(|| self.current.clone());
+        alternate.clear_line(line);
+    }
+
     /// Update the interface's cursor to the specified position, or hide it if unspecified.
     ///
     /// # Examples
@@ -160,7 +185,7 @@ impl Interface<'_> {
         let mut alternate = self.alternate.take().unwrap();
         swap(&mut self.current, &mut alternate);
 
-        let dirty_cells: Vec<(Position, Cell)> = self.current.dirty_iter().collect();
+        let dirty_cells: Vec<(Position, Option<Cell>)> = self.current.dirty_iter().collect();
 
         self.device.queue(cursor::Hide)?;
 
@@ -168,14 +193,22 @@ impl Interface<'_> {
             let move_cursor = cursor::MoveTo(position.x(), position.y());
             self.device.queue(move_cursor)?;
 
-            let mut content_style = ContentStyle::default();
-            if let Some(style) = cell.style() {
-                content_style = get_content_style(*style);
-            }
+            match cell {
+                Some(cell) => {
+                    let mut content_style = ContentStyle::default();
+                    if let Some(style) = cell.style() {
+                        content_style = get_content_style(*style);
+                    }
 
-            let styled_content = StyledContent::new(content_style, cell.grapheme());
-            let print_styled_content = style::PrintStyledContent(styled_content);
-            self.device.queue(print_styled_content)?;
+                    let styled_content = StyledContent::new(content_style, cell.grapheme());
+                    let print_styled_content = style::PrintStyledContent(styled_content);
+                    self.device.queue(print_styled_content)?;
+                }
+                None => {
+                    let clear_content = style::Print(' ');
+                    self.device.queue(clear_content)?;
+                }
+            }
         }
 
         if let Some(position) = self.staged_cursor {
