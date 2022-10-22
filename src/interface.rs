@@ -15,6 +15,7 @@ pub struct Interface<'a> {
     size: Vector,
     current: State,
     alternate: Option<State>,
+    staged_cursor: Option<Position>,
 }
 
 impl Interface<'_> {
@@ -37,11 +38,13 @@ impl Interface<'_> {
             size,
             current: State::new(),
             alternate: None,
+            staged_cursor: None,
         };
 
         let device = &mut interface.device;
         device.enable_raw_mode()?;
         device.queue(terminal::Clear(terminal::ClearType::All))?;
+        device.queue(cursor::Hide)?;
         device.queue(cursor::MoveTo(0, 0))?;
 
         Ok(interface)
@@ -97,6 +100,22 @@ impl Interface<'_> {
         self.stage_text(position, text, Some(style))
     }
 
+    /// Update the interface's cursor to the specified position, or hide it if unspecified.
+    ///
+    /// # Examples
+    /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
+    /// use tty_interface::{Interface, Position, pos};
+    ///
+    /// let mut interface = Interface::new(&mut device)?;
+    /// interface.set_cursor(Some(pos!(1, 2)));
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn set_cursor(&mut self, position: Option<Position>) {
+        self.staged_cursor = position;
+    }
+
     /// Stages the specified text and optional style at a position in the terminal.
     fn stage_text(&mut self, position: Position, text: &str, style: Option<Style>) {
         let alternate = self.alternate.get_or_insert_with(|| self.current.clone());
@@ -143,9 +162,11 @@ impl Interface<'_> {
 
         let dirty_cells: Vec<(Position, Cell)> = self.current.dirty_iter().collect();
 
+        self.device.queue(cursor::Hide)?;
+
         for (position, cell) in dirty_cells {
-            self.device
-                .queue(cursor::MoveTo(position.x(), position.y()))?;
+            let move_cursor = cursor::MoveTo(position.x(), position.y());
+            self.device.queue(move_cursor)?;
 
             let mut content_style = ContentStyle::default();
             if let Some(style) = cell.style() {
@@ -153,8 +174,14 @@ impl Interface<'_> {
             }
 
             let styled_content = StyledContent::new(content_style, cell.grapheme());
+            let print_styled_content = style::PrintStyledContent(styled_content);
+            self.device.queue(print_styled_content)?;
+        }
+
+        if let Some(position) = self.staged_cursor {
             self.device
-                .queue(style::PrintStyledContent(styled_content))?;
+                .queue(cursor::MoveTo(position.x(), position.y()))?;
+            self.device.queue(cursor::Show)?;
         }
 
         self.device.flush()?;

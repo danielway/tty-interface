@@ -28,6 +28,13 @@ fn execute() -> Result<()> {
             &i.to_string(),
             Style::default().set_bold(true).set_foreground(Color::Red),
         );
+
+        if i % 2 == 0 {
+            interface.set_cursor(Some(pos!(10 + i, 3)));
+        } else {
+            interface.set_cursor(None);
+        }
+
         interface.apply()?;
         sleep(Duration::from_millis(250));
     }
