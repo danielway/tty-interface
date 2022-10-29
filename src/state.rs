@@ -39,38 +39,52 @@ impl State {
 
     /// Update a particular cell's grapheme.
     pub(crate) fn set_text(&mut self, position: Position, grapheme: &str) {
-        self.dirty.insert(position);
-        self.cells.insert(
-            position,
-            Cell {
-                grapheme: grapheme.to_string(),
-                style: None,
-            },
-        );
+        self.handle_cell_update(position, grapheme, None);
     }
 
     /// Update a particular cell's grapheme and styling.
     pub(crate) fn set_styled_text(&mut self, position: Position, grapheme: &str, style: Style) {
+        self.handle_cell_update(position, grapheme, Some(style));
+    }
+
+    /// Updates state and queues dirtied positions, if they've changed.
+    fn handle_cell_update(&mut self, position: Position, grapheme: &str, style: Option<Style>) {
+        let new_cell = Cell {
+            grapheme: grapheme.to_string(),
+            style,
+        };
+
+        // If this cell is unchanged, do not mark it dirty
+        if Some(&new_cell) == self.cells.get(&position) {
+            return;
+        }
+
         self.dirty.insert(position);
-        self.cells.insert(
-            position,
-            Cell {
-                grapheme: grapheme.to_string(),
-                style: Some(style),
-            },
-        );
+        self.cells.insert(position, new_cell);
     }
 
     /// Clears all cells in the specified line.
     pub(crate) fn clear_line(&mut self, line: u16) {
-        let deleted_cell_positions: Vec<Position> = self
-            .cells
-            .keys()
-            .filter(|position| position.y() == line)
-            .map(|position| *position)
-            .collect();
+        self.handle_cell_clears(|position| position.y() == line);
+    }
 
-        for position in deleted_cell_positions {
+    /// Clears cells in the line from the specified position.
+    pub(crate) fn clear_rest_of_line(&mut self, from: Position) {
+        self.handle_cell_clears(|position| position.y() == from.y() && position.x() >= from.x());
+    }
+
+    /// Clears cells in the interface from the specified position.
+    pub(crate) fn clear_rest_of_interface(&mut self, from: Position) {
+        self.handle_cell_clears(|position| *position >= &from);
+    }
+
+    /// Clears cells matching the specified predicate, marking them dirtied for re-render.
+    fn handle_cell_clears<P: FnMut(&&Position) -> bool>(&mut self, filter_predicate: P) {
+        let cells = self.cells.keys();
+        let deleted_cells = cells.filter(filter_predicate);
+        let cell_positions: Vec<Position> = deleted_cells.map(|position| *position).collect();
+
+        for position in cell_positions {
             self.cells.remove(&position);
             self.dirty.insert(position);
         }
@@ -288,6 +302,72 @@ mod tests {
             },
             state.cells[&pos!(1, 1)]
         );
+    }
+
+    #[test]
+    fn state_clear_rest_of_line() {
+        let mut state = State::new();
+
+        let content = ["ABC", "DEF", "GHI"];
+
+        for row in 0..content.len() {
+            let text = content[row];
+            for column in 0..text.len() {
+                state.set_text(
+                    pos!(column as u16, row as u16),
+                    text.get(column..column + 1).unwrap(),
+                );
+            }
+        }
+
+        state.clear_dirty();
+
+        assert_eq!(9, state.cells.len());
+
+        state.clear_rest_of_line(pos!(1, 1));
+
+        assert_eq!(7, state.cells.len());
+
+        let dirty_positions: Vec<_> = state.dirty.clone().into_iter().collect();
+        assert_eq!(2, dirty_positions.len());
+        assert_eq!(pos!(1, 1), dirty_positions[0]);
+        assert_eq!(pos!(2, 1), dirty_positions[1]);
+
+        let line_two_cell_count = state.cells.keys().filter(|pos| pos.y() == 1).count();
+        assert_eq!(1, line_two_cell_count);
+    }
+
+    #[test]
+    fn state_clear_rest_of_interface() {
+        let mut state = State::new();
+
+        let content = ["ABC", "DEF", "GHI"];
+
+        for row in 0..content.len() {
+            let text = content[row];
+            for column in 0..text.len() {
+                state.set_text(
+                    pos!(column as u16, row as u16),
+                    text.get(column..column + 1).unwrap(),
+                );
+            }
+        }
+
+        state.clear_dirty();
+
+        assert_eq!(9, state.cells.len());
+
+        state.clear_rest_of_interface(pos!(1, 1));
+
+        assert_eq!(4, state.cells.len());
+
+        let dirty_positions: Vec<_> = state.dirty.clone().into_iter().collect();
+        assert_eq!(5, dirty_positions.len());
+        assert_eq!(pos!(1, 1), dirty_positions[0]);
+        assert_eq!(pos!(2, 1), dirty_positions[1]);
+        assert_eq!(pos!(0, 2), dirty_positions[2]);
+        assert_eq!(pos!(1, 2), dirty_positions[3]);
+        assert_eq!(pos!(2, 2), dirty_positions[4]);
     }
 
     #[test]

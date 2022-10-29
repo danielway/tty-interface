@@ -93,7 +93,7 @@ fn multiple_overlapping_formatted_writes() {
 }
 
 #[test]
-fn clearing() {
+fn clearing_lines() {
     let mut device = VirtualDevice::new();
     let mut interface = Interface::new(&mut device).unwrap();
 
@@ -106,4 +106,36 @@ fn clearing() {
     interface.apply().unwrap();
 
     assert_eq!("ABC\n   \nGHI", &device.parser().screen().contents());
+}
+
+#[test]
+fn clearing_rest_of_line() {
+    let mut device = VirtualDevice::new();
+    let mut interface = Interface::new(&mut device).unwrap();
+
+    interface.set(pos!(0, 0), "ABC");
+    interface.set(pos!(0, 1), "DEF");
+    interface.set(pos!(0, 2), "GHI");
+    interface.apply().unwrap();
+
+    interface.clear_rest_of_line(pos!(1, 1));
+    interface.apply().unwrap();
+
+    assert_eq!("ABC\nD  \nGHI", &device.parser().screen().contents());
+}
+
+#[test]
+fn clearing_rest_of_interface() {
+    let mut device = VirtualDevice::new();
+    let mut interface = Interface::new(&mut device).unwrap();
+
+    interface.set(pos!(0, 0), "ABC");
+    interface.set(pos!(0, 1), "DEF");
+    interface.set(pos!(0, 2), "GHI");
+    interface.apply().unwrap();
+
+    interface.clear_rest_of_interface(pos!(1, 1));
+    interface.apply().unwrap();
+
+    assert_eq!("ABC\nD  \n   ", &device.parser().screen().contents());
 }

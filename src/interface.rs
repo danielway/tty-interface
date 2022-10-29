@@ -130,6 +130,57 @@ impl Interface<'_> {
         alternate.clear_line(line);
     }
 
+    /// Clear the remainder of the line from the specified position. Changes are staged until
+    /// applied.
+    ///
+    /// # Examples
+    /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
+    /// use tty_interface::{Interface, Style, Position, pos};
+    ///
+    /// let mut interface = Interface::new(&mut device)?;
+    ///
+    /// // Write "Hello, world!" to the first line
+    /// interface.set(pos!(0, 0), "Hello, world!");
+    /// interface.apply()?;
+    ///
+    /// // Clear everything after "Hello"
+    /// interface.clear_rest_of_line(pos!(5, 0));
+    /// interface.apply()?;
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn clear_rest_of_line(&mut self, from: Position) {
+        let alternate = self.alternate.get_or_insert_with(|| self.current.clone());
+        alternate.clear_rest_of_line(from);
+    }
+
+    /// Clear the remainder of the interface from the specified position. Changes are staged until
+    /// applied.
+    ///
+    /// # Examples
+    /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
+    /// use tty_interface::{Interface, Style, Position, pos};
+    ///
+    /// let mut interface = Interface::new(&mut device)?;
+    ///
+    /// // Write two lines of content
+    /// interface.set(pos!(0, 0), "Hello, world!");
+    /// interface.set(pos!(0, 1), "Another line");
+    /// interface.apply()?;
+    ///
+    /// // Clear everything after "Hello", including the second line
+    /// interface.clear_rest_of_interface(pos!(5, 0));
+    /// interface.apply()?;
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn clear_rest_of_interface(&mut self, from: Position) {
+        let alternate = self.alternate.get_or_insert_with(|| self.current.clone());
+        alternate.clear_rest_of_interface(from);
+    }
+
     /// Update the interface's cursor to the specified position, or hide it if unspecified.
     ///
     /// # Examples
