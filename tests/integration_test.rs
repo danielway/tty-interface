@@ -53,7 +53,7 @@ fn multiple_overlapping_formatted_writes() {
     let mut device = VirtualDevice::new();
     let mut interface = Interface::new(&mut device).unwrap();
 
-    interface.set_styled(pos!(0, 0), "FIRST", Style::default().set_bold(true));
+    interface.set_styled(pos!(0, 0), "FIRST", Style::new().set_bold(true));
     interface.apply().unwrap();
 
     interface.set(pos!(2, 0), "SECOND");
@@ -62,7 +62,7 @@ fn multiple_overlapping_formatted_writes() {
     interface.set_styled(
         pos!(4, 0),
         "THIRD",
-        Style::default().set_italic(true).set_foreground(Color::Red),
+        Style::new().set_italic(true).set_foreground(Color::Red),
     );
     interface.apply().unwrap();
 

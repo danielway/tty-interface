@@ -18,7 +18,7 @@ fn execute() -> Result<()> {
     interface.set_styled(
         pos!(5, 2),
         "Let's count 0-9:",
-        Style::default().set_italic(true),
+        Style::new().set_italic(true),
     );
     interface.apply()?;
 
@@ -26,7 +26,7 @@ fn execute() -> Result<()> {
         interface.set_styled(
             pos!(10, 3 + i),
             &i.to_string(),
-            Style::default().set_bold(true).set_foreground(Color::Red),
+            Style::new().set_bold(true).set_foreground(Color::Red),
         );
 
         if i % 2 == 0 {

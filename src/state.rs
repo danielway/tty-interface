@@ -173,33 +173,29 @@ mod tests {
     fn state_set_styled_text() {
         let mut state = State::new();
 
-        state.set_styled_text(pos!(0, 0), "X", Style::default().set_bold(true));
-        state.set_styled_text(pos!(1, 3), "Y", Style::default().set_italic(true));
-        state.set_styled_text(
-            pos!(2, 2),
-            "Z",
-            Style::default().set_foreground(Color::Blue),
-        );
+        state.set_styled_text(pos!(0, 0), "X", Style::new().set_bold(true));
+        state.set_styled_text(pos!(1, 3), "Y", Style::new().set_italic(true));
+        state.set_styled_text(pos!(2, 2), "Z", Style::new().set_foreground(Color::Blue));
 
         assert_eq!(3, state.cells.len());
         assert_eq!(
             Cell {
                 grapheme: "X".to_string(),
-                style: Some(Style::default().set_bold(true)),
+                style: Some(Style::new().set_bold(true)),
             },
             state.cells[&pos!(0, 0)],
         );
         assert_eq!(
             Cell {
                 grapheme: "Y".to_string(),
-                style: Some(Style::default().set_italic(true)),
+                style: Some(Style::new().set_italic(true)),
             },
             state.cells[&pos!(1, 3)],
         );
         assert_eq!(
             Cell {
                 grapheme: "Z".to_string(),
-                style: Some(Style::default().set_foreground(Color::Blue)),
+                style: Some(Style::new().set_foreground(Color::Blue)),
             },
             state.cells[&pos!(2, 2)],
         );

@@ -20,13 +20,20 @@ pub enum Color {
     Reset,
 }
 
+impl Color {
+    /// Convert this to a style with this as the foreground color.
+    pub fn as_style(self) -> Style {
+        Style::new().set_foreground(self)
+    }
+}
+
 /// Text formatting styles.
 ///
 /// # Examples
 /// ```
 /// use tty_interface::{Color, Style};
 ///
-/// let style = Style::default().set_foreground(Color::Red).set_bold(true);
+/// let style = Color::Red.as_style().set_bold(true);
 /// ```
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Style {
@@ -37,8 +44,9 @@ pub struct Style {
     is_underline: bool,
 }
 
-impl Default for Style {
-    fn default() -> Self {
+impl Style {
+    /// Create a new style with no colors or styling.
+    pub fn new() -> Self {
         Self {
             foreground_color: None,
             background_color: None,
@@ -47,9 +55,7 @@ impl Default for Style {
             is_underline: false,
         }
     }
-}
 
-impl Style {
     /// Create a new style with the specified foreground color.
     pub fn set_foreground(&self, color: Color) -> Style {
         Style {
@@ -116,7 +122,7 @@ mod tests {
 
     #[test]
     fn style_foreground() {
-        let mut style = Style::default();
+        let mut style = Style::new();
         assert_eq!(None, style.foreground());
 
         style = style.set_foreground(Color::Blue);
@@ -128,7 +134,7 @@ mod tests {
 
     #[test]
     fn style_background() {
-        let mut style = Style::default();
+        let mut style = Style::new();
         assert_eq!(None, style.background());
 
         style = style.set_background(Color::Yellow);
@@ -140,7 +146,7 @@ mod tests {
 
     #[test]
     fn style_bold() {
-        let mut style = Style::default();
+        let mut style = Style::new();
         assert_eq!(false, style.is_bold());
 
         style = style.set_bold(true);
@@ -149,7 +155,7 @@ mod tests {
 
     #[test]
     fn style_italic() {
-        let mut style = Style::default();
+        let mut style = Style::new();
         assert_eq!(false, style.is_italic());
 
         style = style.set_italic(true);
@@ -158,7 +164,7 @@ mod tests {
 
     #[test]
     fn style_underline() {
-        let mut style = Style::default();
+        let mut style = Style::new();
         assert_eq!(false, style.is_underlined());
 
         style = style.set_underline(true);

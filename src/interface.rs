@@ -98,7 +98,7 @@ impl Interface<'_> {
     /// use tty_interface::{Interface, Style, Position, pos};
     ///
     /// let mut interface = Interface::new(&mut device)?;
-    /// interface.set_styled(pos!(1, 1), "Hello, world!", Style::default().set_bold(true));
+    /// interface.set_styled(pos!(1, 1), "Hello, world!", Style::new().set_bold(true));
     /// # Ok::<(), Error>(())
     /// ```
     pub fn set_styled(&mut self, position: Position, text: &str, style: Style) {
