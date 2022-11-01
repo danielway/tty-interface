@@ -16,6 +16,7 @@ pub struct Interface<'a> {
     current: State,
     alternate: Option<State>,
     staged_cursor: Option<Position>,
+    cursor: Position,
 }
 
 impl Interface<'_> {
@@ -39,6 +40,7 @@ impl Interface<'_> {
             current: State::new(),
             alternate: None,
             staged_cursor: None,
+            cursor: pos!(0, 0),
         };
 
         let device = &mut interface.device;
@@ -246,8 +248,10 @@ impl Interface<'_> {
         self.device.queue(cursor::Hide)?;
 
         for (position, cell) in dirty_cells {
-            let move_cursor = cursor::MoveTo(position.x(), position.y());
-            self.device.queue(move_cursor)?;
+            if self.cursor != position {
+                let move_cursor = cursor::MoveTo(position.x(), position.y());
+                self.device.queue(move_cursor)?;
+            }
 
             match cell {
                 Some(cell) => {
@@ -265,6 +269,8 @@ impl Interface<'_> {
                     self.device.queue(clear_content)?;
                 }
             }
+
+            self.cursor = self.cursor.translate(1, 0);
         }
 
         if let Some(position) = self.staged_cursor {
