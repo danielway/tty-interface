@@ -48,6 +48,14 @@ impl Position {
     pub fn y(&self) -> u16 {
         self.y
     }
+
+    /// This position translated by the specified amount.
+    pub fn translate(&self, diff_x: u16, diff_y: u16) -> Self {
+        Self {
+            x: self.x + diff_x,
+            y: self.y + diff_y,
+        }
+    }
 }
 
 impl PartialOrd for Position {
