@@ -1,4 +1,4 @@
-use crate::{Device, Result, Vector};
+use crate::{pos, Device, Position, Result, Vector};
 
 /// A virtual testing device based on the vte/vt100 parser. Ideally, this would be hidden from
 /// production builds and only available to functional, documentation, and unit tests, but that does
@@ -29,6 +29,10 @@ impl Device for VirtualDevice {
 
     fn disable_raw_mode(&mut self) -> Result<()> {
         Ok(())
+    }
+
+    fn get_cursor_position(&mut self) -> Result<Position> {
+        Ok(pos!(0, 0))
     }
 }
 

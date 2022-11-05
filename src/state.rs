@@ -99,6 +99,14 @@ impl State {
     pub(crate) fn dirty_iter(&self) -> StateIter {
         StateIter::new(self, self.dirty.clone().into_iter().collect())
     }
+
+    /// Get the last cell's position.
+    pub(crate) fn get_last_position(&self) -> Option<Position> {
+        self.cells
+            .keys()
+            .last()
+            .and_then(|position| Some(*position))
+    }
 }
 
 /// Iterates through a subset of cells in the state.
@@ -405,5 +413,17 @@ mod tests {
             iter.next()
         );
         assert_eq!(None, iter.next());
+    }
+
+    #[test]
+    fn state_get_last_position() {
+        let mut state = State::new();
+
+        state.set_text(pos!(3, 1), "D");
+        state.set_text(pos!(1, 1), "C");
+        state.set_text(pos!(0, 0), "A");
+        state.set_text(pos!(2, 0), "B");
+
+        assert_eq!(pos!(3, 1), state.get_last_position().unwrap());
     }
 }

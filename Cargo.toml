@@ -13,3 +13,6 @@ crossterm = "0.25.0"
 unicode-segmentation = "1.9.0"
 unicode-width = "0.1.9"
 vt100 = "0.15.1"
+
+[dev-dependencies]
+rand = "0.8.5"

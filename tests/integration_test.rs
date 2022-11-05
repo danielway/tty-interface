@@ -3,7 +3,7 @@ use tty_interface::{self, pos, test::VirtualDevice, Color, Interface, Position, 
 #[test]
 fn basic_write() {
     let mut device = VirtualDevice::new();
-    let mut interface = Interface::new(&mut device).unwrap();
+    let mut interface = Interface::new_alternate(&mut device).unwrap();
 
     interface.set(pos!(0, 0), "Hello, world!");
     interface.apply().unwrap();
@@ -14,7 +14,7 @@ fn basic_write() {
 #[test]
 fn multiple_writes() {
     let mut device = VirtualDevice::new();
-    let mut interface = Interface::new(&mut device).unwrap();
+    let mut interface = Interface::new_alternate(&mut device).unwrap();
 
     interface.set(pos!(0, 0), "Line 1");
     interface.apply().unwrap();
@@ -34,7 +34,7 @@ fn multiple_writes() {
 #[test]
 fn overlapping_writes() {
     let mut device = VirtualDevice::new();
-    let mut interface = Interface::new(&mut device).unwrap();
+    let mut interface = Interface::new_alternate(&mut device).unwrap();
 
     interface.set(pos!(0, 0), "ABCDEF");
     interface.apply().unwrap();
@@ -51,7 +51,7 @@ fn overlapping_writes() {
 #[test]
 fn multiple_overlapping_formatted_writes() {
     let mut device = VirtualDevice::new();
-    let mut interface = Interface::new(&mut device).unwrap();
+    let mut interface = Interface::new_alternate(&mut device).unwrap();
 
     interface.set_styled(pos!(0, 0), "FIRST", Style::new().set_bold(true));
     interface.apply().unwrap();
@@ -95,7 +95,7 @@ fn multiple_overlapping_formatted_writes() {
 #[test]
 fn clearing_lines() {
     let mut device = VirtualDevice::new();
-    let mut interface = Interface::new(&mut device).unwrap();
+    let mut interface = Interface::new_alternate(&mut device).unwrap();
 
     interface.set(pos!(0, 0), "ABC");
     interface.set(pos!(0, 1), "DEF");
@@ -111,7 +111,7 @@ fn clearing_lines() {
 #[test]
 fn clearing_rest_of_line() {
     let mut device = VirtualDevice::new();
-    let mut interface = Interface::new(&mut device).unwrap();
+    let mut interface = Interface::new_alternate(&mut device).unwrap();
 
     interface.set(pos!(0, 0), "ABC");
     interface.set(pos!(0, 1), "DEF");
@@ -127,7 +127,7 @@ fn clearing_rest_of_line() {
 #[test]
 fn clearing_rest_of_interface() {
     let mut device = VirtualDevice::new();
-    let mut interface = Interface::new(&mut device).unwrap();
+    let mut interface = Interface::new_alternate(&mut device).unwrap();
 
     interface.set(pos!(0, 0), "ABC");
     interface.set(pos!(0, 1), "DEF");

@@ -17,10 +17,11 @@ pub struct Interface<'a> {
     alternate: Option<State>,
     staged_cursor: Option<Position>,
     cursor: Position,
+    relative: bool,
 }
 
 impl Interface<'_> {
-    /// Create a new interface for the specified device.
+    /// Create a new interface for the specified device on the alternate screen.
     ///
     /// # Examples
     /// ```
@@ -28,10 +29,10 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::Interface;
     ///
-    /// let interface = Interface::new(&mut device)?;
+    /// let interface = Interface::new_alternate(&mut device)?;
     /// # Ok::<(), Error>(())
     /// ```
-    pub fn new<'a>(device: &'a mut dyn Device) -> Result<Interface<'a>> {
+    pub fn new_alternate<'a>(device: &'a mut dyn Device) -> Result<Interface<'a>> {
         let size = device.get_terminal_size()?;
 
         let mut interface = Interface {
@@ -41,6 +42,7 @@ impl Interface<'_> {
             alternate: None,
             staged_cursor: None,
             cursor: pos!(0, 0),
+            relative: false,
         };
 
         let device = &mut interface.device;
@@ -54,6 +56,36 @@ impl Interface<'_> {
         Ok(interface)
     }
 
+    /// Create a new interface for the specified device which renders relatively in the buffer.
+    ///
+    /// # Examples
+    /// ```
+    /// # use tty_interface::{Error, test::VirtualDevice};
+    /// # let mut device = VirtualDevice::new();
+    /// use tty_interface::Interface;
+    ///
+    /// let interface = Interface::new_relative(&mut device)?;
+    /// # Ok::<(), Error>(())
+    /// ```
+    pub fn new_relative<'a>(device: &'a mut dyn Device) -> Result<Interface<'a>> {
+        let size = device.get_terminal_size()?;
+
+        let mut interface = Interface {
+            device,
+            size,
+            current: State::new(),
+            alternate: None,
+            staged_cursor: None,
+            cursor: pos!(0, 0),
+            relative: true,
+        };
+
+        let device = &mut interface.device;
+        device.enable_raw_mode()?;
+
+        Ok(interface)
+    }
+
     /// When finished using this interface, uninitialize its terminal configuration.
     ///
     /// # Examples
@@ -62,14 +94,21 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::Interface;
     ///
-    /// let interface = Interface::new(&mut device)?;
+    /// let interface = Interface::new_alternate(&mut device)?;
     /// interface.exit()?;
     /// # Ok::<(), Error>(())
     /// ```
-    pub fn exit(self) -> Result<()> {
+    pub fn exit(mut self) -> Result<()> {
+        if !self.relative {
+            self.device.queue(terminal::LeaveAlternateScreen)?;
+            self.device.flush()?;
+        } else {
+            if let Some(last_position) = self.current.get_last_position() {
+                self.move_cursor_to(pos!(0, last_position.y()))?;
+            }
+        }
+
         self.device.disable_raw_mode()?;
-        self.device.queue(terminal::LeaveAlternateScreen)?;
-        self.device.flush()?;
 
         println!();
         Ok(())
@@ -83,7 +122,7 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Position, pos};
     ///
-    /// let mut interface = Interface::new(&mut device)?;
+    /// let mut interface = Interface::new_alternate(&mut device)?;
     /// interface.set(pos!(1, 1), "Hello, world!");
     /// # Ok::<(), Error>(())
     /// ```
@@ -99,7 +138,7 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Style, Position, pos};
     ///
-    /// let mut interface = Interface::new(&mut device)?;
+    /// let mut interface = Interface::new_alternate(&mut device)?;
     /// interface.set_styled(pos!(1, 1), "Hello, world!", Style::new().set_bold(true));
     /// # Ok::<(), Error>(())
     /// ```
@@ -115,7 +154,7 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Style, Position, pos};
     ///
-    /// let mut interface = Interface::new(&mut device)?;
+    /// let mut interface = Interface::new_alternate(&mut device)?;
     ///
     /// // Write "Hello," and "world!" on two different lines
     /// interface.set(pos!(0, 0), "Hello,");
@@ -141,7 +180,7 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Style, Position, pos};
     ///
-    /// let mut interface = Interface::new(&mut device)?;
+    /// let mut interface = Interface::new_alternate(&mut device)?;
     ///
     /// // Write "Hello, world!" to the first line
     /// interface.set(pos!(0, 0), "Hello, world!");
@@ -166,7 +205,7 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Style, Position, pos};
     ///
-    /// let mut interface = Interface::new(&mut device)?;
+    /// let mut interface = Interface::new_alternate(&mut device)?;
     ///
     /// // Write two lines of content
     /// interface.set(pos!(0, 0), "Hello, world!");
@@ -191,11 +230,12 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Position, pos};
     ///
-    /// let mut interface = Interface::new(&mut device)?;
+    /// let mut interface = Interface::new_alternate(&mut device)?;
     /// interface.set_cursor(Some(pos!(1, 2)));
     /// # Ok::<(), Error>(())
     /// ```
     pub fn set_cursor(&mut self, position: Option<Position>) {
+        self.alternate.get_or_insert_with(|| self.current.clone());
         self.staged_cursor = position;
     }
 
@@ -230,7 +270,7 @@ impl Interface<'_> {
     /// # let mut device = VirtualDevice::new();
     /// use tty_interface::{Interface, Position, pos};
     ///
-    /// let mut interface = Interface::new(&mut device)?;
+    /// let mut interface = Interface::new_alternate(&mut device)?;
     /// interface.set(pos!(1, 1), "Hello, world!");
     /// interface.apply()?;
     /// # Ok::<(), Error>(())
@@ -249,8 +289,7 @@ impl Interface<'_> {
 
         for (position, cell) in dirty_cells {
             if self.cursor != position {
-                let move_cursor = cursor::MoveTo(position.x(), position.y());
-                self.device.queue(move_cursor)?;
+                self.move_cursor_to(position)?;
             }
 
             match cell {
@@ -274,14 +313,41 @@ impl Interface<'_> {
         }
 
         if let Some(position) = self.staged_cursor {
-            self.device
-                .queue(cursor::MoveTo(position.x(), position.y()))?;
+            self.move_cursor_to(position)?;
             self.device.queue(cursor::Show)?;
         }
 
         self.device.flush()?;
 
         self.current.clear_dirty();
+
+        Ok(())
+    }
+
+    /// Move the cursor to the specified position and update it in state.
+    fn move_cursor_to(&mut self, position: Position) -> Result<()> {
+        if self.relative {
+            let diff_x = position.x() as i32 - self.cursor.x() as i32;
+            let diff_y = position.y() as i32 - self.cursor.y() as i32;
+
+            if diff_x > 0 {
+                self.device.queue(cursor::MoveRight(diff_x as u16))?;
+            } else if diff_x < 0 {
+                self.device.queue(cursor::MoveLeft(diff_x.abs() as u16))?;
+            }
+
+            if diff_y > 0 {
+                self.device
+                    .queue(style::Print("\n".repeat(diff_y as usize)))?;
+            } else if diff_y < 0 {
+                self.device.queue(cursor::MoveUp(diff_y.abs() as u16))?;
+            }
+        } else {
+            let move_cursor = cursor::MoveTo(position.x(), position.y());
+            self.device.queue(move_cursor)?;
+        }
+
+        self.cursor = position;
 
         Ok(())
     }
@@ -292,25 +358,11 @@ fn get_content_style(style: Style) -> ContentStyle {
     let mut content_style = ContentStyle::default();
 
     if let Some(color) = style.foreground() {
-        match color {
-            Color::Black => content_style.foreground_color = Some(style::Color::Black),
-            Color::DarkGrey => content_style.foreground_color = Some(style::Color::DarkGrey),
-            Color::Red => content_style.foreground_color = Some(style::Color::Red),
-            Color::DarkRed => content_style.foreground_color = Some(style::Color::DarkRed),
-            Color::Green => content_style.foreground_color = Some(style::Color::Green),
-            Color::DarkGreen => content_style.foreground_color = Some(style::Color::DarkGreen),
-            Color::Yellow => content_style.foreground_color = Some(style::Color::Yellow),
-            Color::DarkYellow => content_style.foreground_color = Some(style::Color::DarkYellow),
-            Color::Blue => content_style.foreground_color = Some(style::Color::Blue),
-            Color::DarkBlue => content_style.foreground_color = Some(style::Color::DarkBlue),
-            Color::Magenta => content_style.foreground_color = Some(style::Color::Magenta),
-            Color::DarkMagenta => content_style.foreground_color = Some(style::Color::DarkMagenta),
-            Color::Cyan => content_style.foreground_color = Some(style::Color::Cyan),
-            Color::DarkCyan => content_style.foreground_color = Some(style::Color::DarkCyan),
-            Color::White => content_style.foreground_color = Some(style::Color::White),
-            Color::Grey => content_style.foreground_color = Some(style::Color::Grey),
-            Color::Reset => content_style.foreground_color = Some(style::Color::Reset),
-        };
+        content_style.foreground_color = Some(get_crossterm_color(color));
+    }
+
+    if let Some(color) = style.background() {
+        content_style.background_color = Some(get_crossterm_color(color));
     }
 
     if style.is_bold() {
@@ -326,4 +378,26 @@ fn get_content_style(style: Style) -> ContentStyle {
     }
 
     content_style
+}
+
+fn get_crossterm_color(color: Color) -> crossterm::style::Color {
+    match color {
+        Color::Black => style::Color::Black,
+        Color::DarkGrey => style::Color::DarkGrey,
+        Color::Red => style::Color::Red,
+        Color::DarkRed => style::Color::DarkRed,
+        Color::Green => style::Color::Green,
+        Color::DarkGreen => style::Color::DarkGreen,
+        Color::Yellow => style::Color::Yellow,
+        Color::DarkYellow => style::Color::DarkYellow,
+        Color::Blue => style::Color::Blue,
+        Color::DarkBlue => style::Color::DarkBlue,
+        Color::Magenta => style::Color::Magenta,
+        Color::DarkMagenta => style::Color::DarkMagenta,
+        Color::Cyan => style::Color::Cyan,
+        Color::DarkCyan => style::Color::DarkCyan,
+        Color::White => style::Color::White,
+        Color::Grey => style::Color::Grey,
+        Color::Reset => style::Color::Reset,
+    }
 }
