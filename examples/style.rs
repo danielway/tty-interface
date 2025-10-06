@@ -1,7 +1,7 @@
-use std::io::{stdout, Stdout};
+use std::io::{Stdout, stdout};
 
 use rand::rngs::ThreadRng;
-use tty_interface::{pos, Color, Interface, Position, Result, Style};
+use tty_interface::{Color, Interface, Position, Result, Style, pos};
 
 fn main() {
     execute().expect("execute basic example");

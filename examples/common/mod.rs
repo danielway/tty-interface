@@ -1,6 +1,6 @@
 use std::{thread::sleep, time::Duration};
 
-use tty_interface::{pos, Interface, Position, Result};
+use tty_interface::{Interface, Position, Result, pos};
 
 pub fn render_messages_gradually(interface: &mut Interface, messages: &[&str]) -> Result<()> {
     for line in 1..=messages.len() {

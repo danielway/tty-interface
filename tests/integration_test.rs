@@ -1,4 +1,4 @@
-use tty_interface::{self, pos, test::VirtualDevice, Color, Interface, Position, Style};
+use tty_interface::{self, Color, Interface, Position, Style, pos, test::VirtualDevice};
 
 #[test]
 fn basic_write() {

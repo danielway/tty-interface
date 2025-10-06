@@ -83,7 +83,7 @@ impl Debug for Position {
 mod tests {
     use std::cmp::Ordering;
 
-    use crate::{pos, Position};
+    use crate::{Position, pos};
 
     #[test]
     fn position_initialization() {

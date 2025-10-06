@@ -1,4 +1,4 @@
-use std::io::{stdout, Stdout};
+use std::io::{Stdout, stdout};
 
 use common::render_messages_gradually;
 use tty_interface::{Interface, Result};

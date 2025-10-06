@@ -1,6 +1,6 @@
-use std::io::{stdout, Stdout};
+use std::io::{Stdout, stdout};
 
-use tty_interface::{pos, Interface, Position, Result};
+use tty_interface::{Interface, Position, Result, pos};
 
 fn main() {
     execute().expect("execute basic example");

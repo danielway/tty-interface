@@ -1,13 +1,13 @@
 use std::mem::swap;
 
 use crossterm::{
-    cursor,
+    QueueableCommand, cursor,
     style::{self, Attribute, ContentStyle, StyledContent},
-    terminal, QueueableCommand,
+    terminal,
 };
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::{pos, Cell, Color, Device, Position, Result, State, Style, Vector};
+use crate::{Cell, Color, Device, Position, Result, State, Style, Vector, pos};
 
 /// A TTY-based user-interface providing optimized update rendering.
 pub struct Interface<'a> {
@@ -331,14 +331,16 @@ impl Interface<'_> {
             if diff_x > 0 {
                 self.device.queue(cursor::MoveRight(diff_x as u16))?;
             } else if diff_x < 0 {
-                self.device.queue(cursor::MoveLeft(diff_x.unsigned_abs() as u16))?;
+                self.device
+                    .queue(cursor::MoveLeft(diff_x.unsigned_abs() as u16))?;
             }
 
             if diff_y > 0 {
                 self.device
                     .queue(style::Print("\n".repeat(diff_y as usize)))?;
             } else if diff_y < 0 {
-                self.device.queue(cursor::MoveUp(diff_y.unsigned_abs() as u16))?;
+                self.device
+                    .queue(cursor::MoveUp(diff_y.unsigned_abs() as u16))?;
             }
         } else {
             let move_cursor = cursor::MoveTo(position.x(), position.y());

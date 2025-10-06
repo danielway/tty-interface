@@ -1,10 +1,10 @@
 use std::{
-    io::{stdout, Stdout},
+    io::{Stdout, stdout},
     thread::sleep,
     time::Duration,
 };
 
-use tty_interface::{pos, Color, Interface, Position, Result, Style};
+use tty_interface::{Color, Interface, Position, Result, Style, pos};
 
 fn main() {
     execute().expect("execute counting example");

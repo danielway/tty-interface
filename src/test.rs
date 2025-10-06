@@ -1,4 +1,4 @@
-use crate::{pos, Device, Position, Result, Vector};
+use crate::{Device, Position, Result, Vector, pos};
 
 /// A virtual testing device based on the vte/vt100 parser. Ideally, this would be hidden from
 /// production builds and only available to functional, documentation, and unit tests, but that does

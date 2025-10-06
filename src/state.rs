@@ -102,9 +102,7 @@ impl State {
 
     /// Get the last cell's position.
     pub(crate) fn get_last_position(&self) -> Option<Position> {
-        self.cells
-            .keys()
-            .last().copied()
+        self.cells.keys().last().copied()
     }
 }
 
@@ -132,10 +130,7 @@ impl Iterator for StateIter<'_> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.positions.len() {
             let position = self.positions[self.index];
-            let cell = self
-                .state
-                .cells
-                .get(&position).cloned();
+            let cell = self.state.cells.get(&position).cloned();
 
             self.index += 1;
             Some((position, cell))
@@ -147,7 +142,7 @@ impl Iterator for StateIter<'_> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{pos, Color, Position, Style};
+    use crate::{Color, Position, Style, pos};
 
     use super::{Cell, State};
 

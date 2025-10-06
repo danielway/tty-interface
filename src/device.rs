@@ -1,4 +1,4 @@
-use crate::{pos, Position, Result, Vector};
+use crate::{Position, Result, Vector, pos};
 
 /// An output device to be controlled for displaying an interface.
 pub trait Device: std::io::Write {
