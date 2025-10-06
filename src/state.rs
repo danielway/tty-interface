@@ -126,7 +126,7 @@ impl StateIter<'_> {
     }
 }
 
-impl<'a> Iterator for StateIter<'_> {
+impl Iterator for StateIter<'_> {
     type Item = (Position, Option<Cell>);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -316,8 +316,7 @@ mod tests {
 
         let content = ["ABC", "DEF", "GHI"];
 
-        for row in 0..content.len() {
-            let text = content[row];
+        for (row, text) in content.iter().enumerate() {
             for column in 0..text.len() {
                 state.set_text(
                     pos!(column as u16, row as u16),
@@ -349,8 +348,7 @@ mod tests {
 
         let content = ["ABC", "DEF", "GHI"];
 
-        for row in 0..content.len() {
-            let text = content[row];
+        for (row, text) in content.iter().enumerate() {
             for column in 0..text.len() {
                 state.set_text(
                     pos!(column as u16, row as u16),
