@@ -1,0 +1,13 @@
+{
+  "name": "Rust",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/rust:1": {
+      "version": "latest",
+      "profile": "minimal"
+    }
+  },
+  "containerUser": "vscode",
+  "updateContentCommand": "rustup update stable && rustup default stable",
+  "postCreateCommand": "rustc -Vv && cargo clippy -V && rustup show"
+}
