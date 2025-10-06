@@ -96,7 +96,7 @@ impl State {
     }
 
     /// Create an iterator for this state's dirty cells.
-    pub(crate) fn dirty_iter(&self) -> StateIter {
+    pub(crate) fn dirty_iter(&self) -> StateIter<'_> {
         StateIter::new(self, self.dirty.clone().into_iter().collect())
     }
 
@@ -118,7 +118,7 @@ pub(crate) struct StateIter<'a> {
 
 impl StateIter<'_> {
     /// Create a new state iterator with the specified positions starting from the first position.
-    fn new(state: &State, positions: Vec<Position>) -> StateIter {
+    fn new(state: &State, positions: Vec<Position>) -> StateIter<'_> {
         StateIter {
             state,
             positions,
