@@ -4,10 +4,11 @@
   "features": {
     "ghcr.io/devcontainers/features/rust:1": {
       "version": "latest",
-      "profile": "minimal"
+      "profile": "minimal",
+      "components": "clippy,rustfmt"
     }
   },
   "containerUser": "vscode",
   "updateContentCommand": "rustup update stable && rustup default stable",
-  "postCreateCommand": "rustc -Vv && cargo clippy -V && rustup show"
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libglib2.0-dev libpango1.0-dev libcairo2-dev && rustc -Vv && cargo clippy -V && rustup show"
 }

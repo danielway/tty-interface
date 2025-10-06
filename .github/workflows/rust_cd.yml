@@ -8,11 +8,18 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  publish:
+  ci:
+    uses: ./.github/workflows/rust_ci.yml
 
+  publish:
+    needs: ci
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Publish
-      run: cargo publish --token ${{ secrets.CRATES_IO }}
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO }}
+        run: cargo publish --all-features
