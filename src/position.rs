@@ -12,7 +12,7 @@ use std::fmt::Debug;
 /// ```
 #[macro_export]
 macro_rules! pos {
-    ($x: expr, $y: expr) => {
+    ($x: expr_2021, $y: expr_2021) => {
         Position::new($x, $y)
     };
 }
