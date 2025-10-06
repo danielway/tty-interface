@@ -4,7 +4,7 @@ authors = ["Daniel Way <contact@danieldway.com>"]
 name = "tty-interface"
 version = "4.0.0"
 license = "MIT"
-edition = "2021"
+edition = "2024"
 repository = "https://github.com/danielway/tty-interface"
 exclude = [".github"]
 
