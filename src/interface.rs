@@ -102,10 +102,8 @@ impl Interface<'_> {
         if !self.relative {
             self.device.queue(terminal::LeaveAlternateScreen)?;
             self.device.flush()?;
-        } else {
-            if let Some(last_position) = self.current.get_last_position() {
-                self.move_cursor_to(pos!(0, last_position.y()))?;
-            }
+        } else if let Some(last_position) = self.current.get_last_position() {
+            self.move_cursor_to(pos!(0, last_position.y()))?;
         }
 
         self.device.disable_raw_mode()?;
@@ -243,11 +241,11 @@ impl Interface<'_> {
     fn stage_text(&mut self, position: Position, text: &str, style: Option<Style>) {
         let alternate = self.alternate.get_or_insert_with(|| self.current.clone());
 
-        let mut line = position.y().into();
-        let mut column = position.x().into();
+        let mut line = position.y();
+        let mut column = position.x();
 
         for grapheme in text.graphemes(true) {
-            if column > self.size.x().into() {
+            if column > self.size.x() {
                 column = 0;
                 line += 1;
             }
@@ -333,14 +331,14 @@ impl Interface<'_> {
             if diff_x > 0 {
                 self.device.queue(cursor::MoveRight(diff_x as u16))?;
             } else if diff_x < 0 {
-                self.device.queue(cursor::MoveLeft(diff_x.abs() as u16))?;
+                self.device.queue(cursor::MoveLeft(diff_x.unsigned_abs() as u16))?;
             }
 
             if diff_y > 0 {
                 self.device
                     .queue(style::Print("\n".repeat(diff_y as usize)))?;
             } else if diff_y < 0 {
-                self.device.queue(cursor::MoveUp(diff_y.abs() as u16))?;
+                self.device.queue(cursor::MoveUp(diff_y.unsigned_abs() as u16))?;
             }
         } else {
             let move_cursor = cursor::MoveTo(position.x(), position.y());

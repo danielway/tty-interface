@@ -44,6 +44,12 @@ pub struct Style {
     is_underline: bool,
 }
 
+impl Default for Style {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Style {
     /// Create a new style with no colors or styling.
     pub fn new() -> Self {
@@ -147,27 +153,27 @@ mod tests {
     #[test]
     fn style_bold() {
         let mut style = Style::new();
-        assert_eq!(false, style.is_bold());
+        assert!(!style.is_bold());
 
         style = style.set_bold(true);
-        assert_eq!(true, style.is_bold());
+        assert!(style.is_bold());
     }
 
     #[test]
     fn style_italic() {
         let mut style = Style::new();
-        assert_eq!(false, style.is_italic());
+        assert!(!style.is_italic());
 
         style = style.set_italic(true);
-        assert_eq!(true, style.is_italic());
+        assert!(style.is_italic());
     }
 
     #[test]
     fn style_underline() {
         let mut style = Style::new();
-        assert_eq!(false, style.is_underlined());
+        assert!(!style.is_underlined());
 
         style = style.set_underline(true);
-        assert_eq!(true, style.is_underlined());
+        assert!(style.is_underlined());
     }
 }

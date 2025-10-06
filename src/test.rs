@@ -5,6 +5,12 @@ use crate::{pos, Device, Position, Result, Vector};
 /// not seem to be possible currently.
 pub struct VirtualDevice(vt100::Parser);
 
+impl Default for VirtualDevice {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl VirtualDevice {
     /// Create a new device based around a virtual terminal.
     pub fn new() -> Self {

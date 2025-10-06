@@ -82,7 +82,7 @@ impl State {
     fn handle_cell_clears<P: FnMut(&&Position) -> bool>(&mut self, filter_predicate: P) {
         let cells = self.cells.keys();
         let deleted_cells = cells.filter(filter_predicate);
-        let cell_positions: Vec<Position> = deleted_cells.map(|position| *position).collect();
+        let cell_positions: Vec<Position> = deleted_cells.copied().collect();
 
         for position in cell_positions {
             self.cells.remove(&position);
@@ -104,8 +104,7 @@ impl State {
     pub(crate) fn get_last_position(&self) -> Option<Position> {
         self.cells
             .keys()
-            .last()
-            .and_then(|position| Some(*position))
+            .last().copied()
     }
 }
 
@@ -136,8 +135,7 @@ impl<'a> Iterator for StateIter<'_> {
             let cell = self
                 .state
                 .cells
-                .get(&position)
-                .and_then(|cell| Some(cell.clone()));
+                .get(&position).cloned();
 
             self.index += 1;
             Some((position, cell))
