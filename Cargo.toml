@@ -10,9 +10,9 @@ exclude = [".github"]
 
 [dependencies]
 crossterm = "0.25.0"
-unicode-segmentation = "1.9.0"
-unicode-width = "0.1.9"
-vt100 = "0.15.1"
+unicode-segmentation = "1.12.0"
+unicode-width = "0.1.14"
+vt100 = "0.15.2"
 
 [dev-dependencies]
 rand = "0.8.5"
