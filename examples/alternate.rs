@@ -1,9 +1,9 @@
 use std::io::{stdout, Stdout};
 
-use messages::render_messages_gradually;
+use common::render_messages_gradually;
 use tty_interface::{Interface, Result};
 
-mod messages;
+mod common;
 
 fn main() {
     execute().expect("execute alternate example");

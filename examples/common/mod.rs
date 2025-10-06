@@ -2,10 +2,6 @@ use std::{thread::sleep, time::Duration};
 
 use tty_interface::{pos, Interface, Position, Result};
 
-fn main() {
-    println!("Try the \"relative\" or \"alternate\" example.");
-}
-
 pub fn render_messages_gradually(interface: &mut Interface, messages: &[&str]) -> Result<()> {
     for line in 1..=messages.len() {
         render_messages(interface, &messages[0..line])?;
