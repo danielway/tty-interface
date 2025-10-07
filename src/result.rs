@@ -5,11 +5,11 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug)]
 pub enum Error {
     /// A low-level terminal interaction error.
-    Terminal(crossterm::ErrorKind),
+    Terminal(std::io::Error),
 }
 
-impl From<crossterm::ErrorKind> for Error {
-    fn from(err: crossterm::ErrorKind) -> Self {
+impl From<std::io::Error> for Error {
+    fn from(err: std::io::Error) -> Self {
         Error::Terminal(err)
     }
 }
