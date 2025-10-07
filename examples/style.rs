@@ -14,7 +14,7 @@ fn execute() -> Result<()> {
     interface.set(pos!(0, 0), "Here's the alphabet formatted randomly:");
 
     let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let mut rand = rand::thread_rng();
+    let mut rand = rand::rng();
 
     for line in 1..=10 {
         for (col, ch) in alphabet.chars().enumerate() {
@@ -36,9 +36,9 @@ fn execute() -> Result<()> {
 fn get_random_style(rand: &mut ThreadRng) -> Style {
     let mut style = Style::new();
 
-    style = style.set_bold(rand::Rng::gen_bool(rand, 0.5));
-    style = style.set_italic(rand::Rng::gen_bool(rand, 0.5));
-    style = style.set_underline(rand::Rng::gen_bool(rand, 0.5));
+    style = style.set_bold(rand::Rng::random_bool(rand, 0.5));
+    style = style.set_italic(rand::Rng::random_bool(rand, 0.5));
+    style = style.set_underline(rand::Rng::random_bool(rand, 0.5));
 
     style = style.set_foreground(get_random_color(rand));
     style = style.set_background(get_random_color(rand));
@@ -47,7 +47,7 @@ fn get_random_style(rand: &mut ThreadRng) -> Style {
 }
 
 fn get_random_color(rand: &mut ThreadRng) -> Color {
-    match rand::Rng::gen_range(rand, 0..17) {
+    match rand::Rng::random_range(rand, 0..17) {
         0 => Color::Black,
         1 => Color::DarkGrey,
         2 => Color::Red,
