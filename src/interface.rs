@@ -100,12 +100,16 @@ impl Interface<'_> {
     /// ```
     pub fn exit(mut self) -> Result<()> {
         if !self.relative {
+            self.device.queue(cursor::Show)?;
             self.device.queue(terminal::LeaveAlternateScreen)?;
-            self.device.flush()?;
-        } else if let Some(last_position) = self.current.get_last_position() {
-            self.move_cursor_to(pos!(0, last_position.y()))?;
+        } else {
+            if let Some(last_position) = self.current.get_last_position() {
+                self.move_cursor_to(pos!(0, last_position.y()))?;
+            }
+            self.device.queue(cursor::Show)?;
         }
 
+        self.device.flush()?;
         self.device.disable_raw_mode()?;
 
         println!();

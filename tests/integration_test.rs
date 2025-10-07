@@ -139,3 +139,39 @@ fn clearing_rest_of_interface() {
 
     assert_eq!("ABC\nD  \n   ", &device.parser().screen().contents());
 }
+
+#[test]
+fn cursor_visible_after_exit_alternate() {
+    let mut device = VirtualDevice::new();
+    let interface = Interface::new_alternate(&mut device).unwrap();
+
+    interface.exit().unwrap();
+
+    let is_visible = !device.parser().screen().hide_cursor();
+    assert!(is_visible);
+}
+
+#[test]
+fn cursor_visible_after_exit_relative() {
+    let mut device = VirtualDevice::new();
+    let interface = Interface::new_relative(&mut device).unwrap();
+
+    interface.exit().unwrap();
+
+    let is_visible = !device.parser().screen().hide_cursor();
+    assert!(is_visible);
+}
+
+#[test]
+fn cursor_visible_after_exit_with_content() {
+    let mut device = VirtualDevice::new();
+    let mut interface = Interface::new_alternate(&mut device).unwrap();
+
+    interface.set(pos!(0, 0), "Hello, world!");
+    interface.apply().unwrap();
+
+    interface.exit().unwrap();
+
+    let is_visible = !device.parser().screen().hide_cursor();
+    assert!(is_visible);
+}
