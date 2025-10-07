@@ -7,5 +7,5 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(ThisError, Debug)]
 pub enum Error {
     #[error("terminal interaction error")]
-    TerminalError(#[from] std::io::Error),
+    Terminal(#[from] std::io::Error),
 }
