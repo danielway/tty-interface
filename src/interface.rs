@@ -108,7 +108,7 @@ impl Interface<'_> {
             }
             self.device.queue(cursor::Show)?;
         }
-        
+
         self.device.flush()?;
         self.device.disable_raw_mode()?;
 
